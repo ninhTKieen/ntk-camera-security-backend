@@ -7,8 +7,8 @@ import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { LoginDto, LoginResponseDto } from './dto/login.dto';
 import { RegisterDto, RegisterResponseDto } from './dto/register.dto';
 
-@Controller('auth')
-@ApiTags('auth')
+@Controller('api/auth')
+@ApiTags('Auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 

@@ -23,9 +23,9 @@ import { GetDetailUserDto } from './dto/get-detail-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
 
-@Controller('users')
+@Controller('api/users')
 @ApiSecurity('access-token')
-@ApiTags('users')
+@ApiTags('Users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 

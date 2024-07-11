@@ -17,9 +17,9 @@ import { ApiOkResponseCommon } from 'src/common/common-swagger-response.dto';
 import { UploadImageResponseDto } from './dto/upload-image-response.dto';
 import { ImageService } from './image.service';
 
-@Controller('image')
+@Controller('api/image')
 @ApiSecurity('access-token')
-@ApiTags('image')
+@ApiTags('Image')
 export class ImageController {
   constructor(private readonly imageService: ImageService) {}
 

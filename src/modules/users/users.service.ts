@@ -104,20 +104,7 @@ export class UsersService {
   }
 
   async findWithEmail(email: string, includePassword = false) {
-    const qb = this.userRepository
-      .createQueryBuilder('user')
-      .where({ email })
-      .select([
-        'user.id',
-        'user.email',
-        'user.name',
-        'user.username',
-        'user.phoneNumber',
-        'user.imageUrl',
-        'user.gender',
-        'user.dateOfBirth',
-        'user.role',
-      ]);
+    const qb = this.userRepository.createQueryBuilder('user').where({ email });
 
     if (includePassword) {
       qb.addSelect('user.password');

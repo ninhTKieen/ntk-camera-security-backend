@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import * as admin from 'firebase-admin';
+import { Notification } from 'firebase-admin/lib/messaging/messaging-api';
 import { FcmToken } from 'src/entities/fcm-token.entity';
 import { User } from 'src/entities/user.entity';
 import { Repository } from 'typeorm';
@@ -30,5 +32,19 @@ export class FirebaseService {
         user: userInfo,
       });
     }
+  }
+
+  async sendOne(
+    token: string,
+    notification: Notification,
+    data?: {
+      [key: string]: string;
+    },
+  ) {
+    await admin.messaging().sendEachForMulticast({
+      tokens: [token],
+      notification,
+      data,
+    });
   }
 }

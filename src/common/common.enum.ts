@@ -9,11 +9,6 @@ export enum EGender {
   OTHER = 'OTHER',
 }
 
-export enum EFcmNotificationStatus {
-  ACTIVE = 'ACTIVE',
-  INACTIVE = 'INACTIVE',
-}
-
 export enum ENotificationStatus {
   READ = 'READ',
   UNREAD = 'UNREAD',

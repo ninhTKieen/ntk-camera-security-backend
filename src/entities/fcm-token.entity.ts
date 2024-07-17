@@ -1,4 +1,4 @@
-import { EFcmNotificationStatus, EWebAppType } from 'src/common/common.enum';
+import { EWebAppType } from 'src/common/common.enum';
 import {
   Column,
   Entity,
@@ -21,10 +21,13 @@ export class FcmToken extends FullAuditedEntity {
   @Column({ type: 'enum', enum: EWebAppType, nullable: false })
   webAppType: EWebAppType;
 
-  @Column({ type: 'enum', enum: EFcmNotificationStatus, nullable: false })
-  status: EFcmNotificationStatus;
+  @Column({ type: 'timestamp', nullable: false })
+  date: Date;
 
   @ManyToOne(() => User)
   @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
   user: User;
+
+  @Column({ type: 'string', nullable: true })
+  language: string;
 }

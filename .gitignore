@@ -38,3 +38,6 @@ lerna-debug.log*
 .env.local
 .env.development
 .env.production
+
+# Firebase
+firebase-admin-sdk.json

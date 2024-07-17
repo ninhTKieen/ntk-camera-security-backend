@@ -9,3 +9,6 @@ export const ErrorMessages = {
   FORBIDDEN: 'Forbidden',
   NOT_ACCEPTABLE: 'Not acceptable',
 };
+
+export const FIREBASE_PROVIDER_NAME = 'FIREBASE';
+export const CLOUDINARY_PROVIDER_NAME = 'CLOUDINARY';

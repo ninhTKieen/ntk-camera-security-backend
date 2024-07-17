@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
-import { IAuthConfig } from 'src/configs/auth.config';
+import { TConfigs } from 'src/configs';
+import { TAuthConfig } from 'src/configs/auth.config';
 
 import { UsersModule } from '../users/users.module';
 import { AuthController } from './auth.controller';
@@ -13,10 +14,11 @@ import { AuthService } from './auth.service';
     JwtModule.registerAsync({
       global: true,
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService<IAuthConfig>) => ({
-        secret: configService.get('jwtSecretKey'),
+      useFactory: async (configService: ConfigService<TConfigs>) => ({
+        secret: configService.get<TAuthConfig>('auth').jwtSecretKey,
         signOptions: {
-          expiresIn: configService.get('jwtShortExpiresIn'),
+          algorithm: 'HS256',
+          expiresIn: configService.get<TAuthConfig>('auth').jwtShortExpiresIn,
         },
       }),
       inject: [ConfigService],

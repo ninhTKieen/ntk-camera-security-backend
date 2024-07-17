@@ -3,8 +3,8 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { ERole } from 'src/common/common.enum';
-import { IAppConfig } from 'src/configs/app.config';
-import { IAuthConfig } from 'src/configs/auth.config';
+import { TAppConfig } from 'src/configs/app.config';
+import { TAuthConfig } from 'src/configs/auth.config';
 import { ErrorMessages } from 'src/configs/constant.config';
 
 import { UsersService } from '../users/users.service';
@@ -18,7 +18,7 @@ export class AuthService {
   constructor(
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
-    private readonly configService: ConfigService<IAppConfig & IAuthConfig>,
+    private readonly configService: ConfigService,
   ) {}
 
   async login(loginDto: LoginDto): Promise<LoginResponseDto> {
@@ -56,7 +56,7 @@ export class AuthService {
 
     registerDto.password = bcrypt.hashSync(
       registerDto.password,
-      this.configService.get('bcryptSalt'),
+      this.configService.getOrThrow<TAppConfig>('app').bcryptSalt,
     );
     registerDto.role = ERole.USER;
 
@@ -86,7 +86,7 @@ export class AuthService {
 
     user.password = bcrypt.hashSync(
       newPassword,
-      this.configService.get('bcryptSalt'),
+      this.configService.getOrThrow<TAppConfig>('app').bcryptSalt,
     );
     // by default should be user
     user.role = ERole.USER;
@@ -131,8 +131,9 @@ export class AuthService {
       },
       {
         expiresIn: isLongExpires
-          ? this.configService.get('jwtLongExpiresIn')
-          : this.configService.get('jwtShortExpiresIn'),
+          ? this.configService.getOrThrow<TAuthConfig>('auth').jwtLongExpiresIn
+          : this.configService.getOrThrow<TAuthConfig>('auth')
+              .jwtShortExpiresIn,
       },
     );
   }

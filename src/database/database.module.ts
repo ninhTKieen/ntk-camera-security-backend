@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { IDatabaseConfig } from 'src/configs/database.config';
+import { TConfigs } from 'src/configs';
+import { TDatabaseConfig } from 'src/configs/database.config';
 import { User } from 'src/entities/user.entity';
 import { DataSource } from 'typeorm';
 
@@ -9,14 +10,16 @@ import { DataSource } from 'typeorm';
   imports: [
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService<IDatabaseConfig>) => ({
+      useFactory: async (configService: ConfigService<TConfigs>) => ({
         type: 'postgres',
-        host: configService.get('dbHost'),
-        port: configService.get('dbPort'),
-        username: configService.get('dbUsername'),
-        password: configService.get('dbPassword'),
-        database: configService.get('dbName'),
-        ssl: configService.get('dbSSl'),
+        host: configService.getOrThrow<TDatabaseConfig>('database').dbHost,
+        port: configService.getOrThrow<TDatabaseConfig>('database').dbPort,
+        username:
+          configService.getOrThrow<TDatabaseConfig>('database').dbUsername,
+        password:
+          configService.getOrThrow<TDatabaseConfig>('database').dbPassword,
+        database: configService.getOrThrow<TDatabaseConfig>('database').dbName,
+        ssl: configService.getOrThrow<TDatabaseConfig>('database').dbSSl,
         entities: [User],
       }),
       dataSourceFactory: async (options) => {

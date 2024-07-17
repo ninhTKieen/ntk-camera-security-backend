@@ -14,7 +14,10 @@ export class CreateFcmTokenDto {
   @IsNotEmpty()
   token: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    type: 'enum',
+    enum: EWebAppType,
+  })
   @IsEnum(EWebAppType)
   webAppType: EWebAppType;
 
@@ -22,7 +25,7 @@ export class CreateFcmTokenDto {
   @IsDate()
   date: Date;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @IsString()
   @IsOptional()
   language?: string;

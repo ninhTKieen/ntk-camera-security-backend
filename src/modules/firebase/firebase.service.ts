@@ -18,16 +18,16 @@ export class FirebaseService {
 
     const existingToken = await this.fcmTokenRepository
       .createQueryBuilder('fcmToken')
-      .where('fcmToken.token = :token', { token: createFcmToken.token })
-      .andWhere('fcmToken.user = :userId', { userId })
+      .where('fcmToken.user_id = :userId', { userId })
+      .andWhere('fcmToken.token = :token', { token: createFcmToken.token })
       .getOne();
 
     if (existingToken) {
       return existingToken;
     } else {
-      this.fcmTokenRepository.save({
-        userId,
+      return this.fcmTokenRepository.save({
         ...createFcmToken,
+        user: userInfo,
       });
     }
   }

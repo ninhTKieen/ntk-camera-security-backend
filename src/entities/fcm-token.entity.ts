@@ -18,9 +18,6 @@ export class FcmToken extends FullAuditedEntity {
   @Column({ type: 'varchar', nullable: false })
   token: string;
 
-  @Column({ type: 'enum', enum: EWebAppType, nullable: false })
-  webAppType: EWebAppType;
-
   @Column({ type: 'timestamp', nullable: false })
   date: Date;
 
@@ -28,6 +25,9 @@ export class FcmToken extends FullAuditedEntity {
   @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
   user: User;
 
-  @Column({ type: 'string', nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   language: string;
+
+  @Column({ type: 'enum', enum: EWebAppType, nullable: false })
+  webAppType: EWebAppType;
 }

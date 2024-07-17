@@ -1,7 +1,6 @@
 import { ENotificationStatus } from 'src/common/common.enum';
 import {
-  Column,
-  Entity,
+  Column, // Entity,
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
@@ -10,7 +9,7 @@ import {
 import { FullAuditedEntity } from './full-audited.entity';
 import { User } from './user.entity';
 
-@Entity('fcm_tokens')
+// @Entity('fcm_tokens')
 export class Notification extends FullAuditedEntity {
   @PrimaryGeneratedColumn()
   id: number;

@@ -27,10 +27,15 @@ export class FirebaseService {
     if (existingToken) {
       return existingToken;
     } else {
-      return this.fcmTokenRepository.save({
-        ...createFcmToken,
-        user: userInfo,
-      });
+      if (existingToken.deviceId === createFcmToken.deviceId) {
+        existingToken.token = createFcmToken.token;
+        return this.fcmTokenRepository.save(existingToken);
+      } else {
+        return this.fcmTokenRepository.save({
+          ...createFcmToken,
+          user: userInfo,
+        });
+      }
     }
   }
 

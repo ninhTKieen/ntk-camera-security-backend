@@ -1,9 +1,9 @@
 import { UploadApiErrorResponse as UploadImageErrorResponse } from 'cloudinary';
 
 interface UploadImageSuccessResponse {
-  id: string;
-  url: string;
-  secureUrl: string;
+  imagePublicId: string;
+  imagePublicUrl: string;
+  imageSecureUrl: string;
   width: number;
   height: number;
   format: string;

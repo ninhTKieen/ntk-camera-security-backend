@@ -17,9 +17,9 @@ export class ImageService {
             reject(error);
           }
           resolve({
-            id: result.public_id,
-            url: result.secure_url,
-            secureUrl: result.secure_url,
+            imagePublicId: result.public_id,
+            imagePublicUrl: result.secure_url,
+            imageSecureUrl: result.secure_url,
             width: result.width,
             height: result.height,
             format: result.format,

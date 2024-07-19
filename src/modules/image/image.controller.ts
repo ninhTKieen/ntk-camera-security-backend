@@ -1,7 +1,10 @@
 import {
   Controller,
+  Delete,
+  Param,
   Post,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -14,6 +17,7 @@ import {
 } from '@nestjs/swagger';
 import { ApiOkResponseCommon } from 'src/common/common-swagger-response.dto';
 
+import { AuthGuard } from '../auth/guards/auth.guard';
 import { UploadImageResponseDto } from './dto/upload-image-response.dto';
 import { ImageService } from './image.service';
 
@@ -42,5 +46,13 @@ export class ImageController {
   @ApiOkResponseCommon(UploadImageResponseDto)
   uploadImage(@UploadedFile() file: Express.Multer.File) {
     return this.imageService.uploadFile(file);
+  }
+
+  @Delete(':publicId')
+  @ApiOperation({ summary: 'Delete image' })
+  @ApiOkResponseCommon(Boolean)
+  @UseGuards(AuthGuard)
+  deleteImage(@Param('publicId') publicId: string) {
+    return this.imageService.deleteFile(publicId);
   }
 }

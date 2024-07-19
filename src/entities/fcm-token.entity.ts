@@ -21,6 +21,9 @@ export class FcmToken extends FullAuditedEntity {
   @Column({ type: 'timestamp', nullable: false })
   date: Date;
 
+  @Column({ type: 'varchar', nullable: false })
+  deviceId: string;
+
   @ManyToOne(() => User)
   @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
   user: User;

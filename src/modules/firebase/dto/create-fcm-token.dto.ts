@@ -22,6 +22,10 @@ export class CreateFcmTokenDto {
   webAppType: EWebAppType;
 
   @ApiProperty()
+  @IsString()
+  deviceId: string;
+
+  @ApiProperty()
   @IsDate()
   date: Date;
 

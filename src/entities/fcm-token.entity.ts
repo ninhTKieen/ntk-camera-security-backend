@@ -18,9 +18,6 @@ export class FcmToken extends FullAuditedEntity {
   @Column({ type: 'varchar', nullable: false })
   token: string;
 
-  @Column({ type: 'timestamp', nullable: false })
-  date: Date;
-
   @Column({ type: 'varchar', nullable: false })
   deviceId: string;
 

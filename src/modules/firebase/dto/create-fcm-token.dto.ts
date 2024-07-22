@@ -1,11 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsDate,
-  IsEnum,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-} from 'class-validator';
+import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { EWebAppType } from 'src/common/common.enum';
 
 export class CreateFcmTokenDto {
@@ -24,10 +18,6 @@ export class CreateFcmTokenDto {
   @ApiProperty()
   @IsString()
   deviceId: string;
-
-  @ApiProperty()
-  @IsDate()
-  date: Date;
 
   @ApiProperty({ required: false })
   @IsString()

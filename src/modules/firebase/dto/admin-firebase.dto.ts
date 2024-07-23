@@ -26,10 +26,23 @@ export class NotificationDto {
 
 export class SendNotificationDto {
   @ApiProperty()
-  @IsString()
   @IsNotEmpty()
-  token: string;
+  tokens: string[];
 
+  @ApiProperty({ type: NotificationDto })
+  @ValidateNested()
+  @Type(() => NotificationDto)
+  @IsNotEmpty()
+  notification: NotificationDto;
+
+  @ApiProperty({ type: 'object', required: false })
+  @IsOptional()
+  data?: {
+    [key: string]: string;
+  };
+}
+
+export class SendOneNotificationDto {
   @ApiProperty({ type: NotificationDto })
   @ValidateNested()
   @Type(() => NotificationDto)

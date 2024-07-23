@@ -8,6 +8,8 @@ export const ErrorMessages = {
   BAD_REQUEST: 'Bad request',
   FORBIDDEN: 'Forbidden',
   NOT_ACCEPTABLE: 'Not acceptable',
+  INVALID_URL: 'Invalid URL',
+  TOKEN_NOT_FOUND: 'Token not found',
 };
 
 export const FIREBASE_PROVIDER_NAME = 'FIREBASE';

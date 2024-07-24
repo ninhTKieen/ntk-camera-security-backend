@@ -10,6 +10,7 @@ export const ErrorMessages = {
   NOT_ACCEPTABLE: 'Not acceptable',
   INVALID_URL: 'Invalid URL',
   TOKEN_NOT_FOUND: 'Token not found',
+  NOT_ALLOWED: 'You are not allowed to access this resource',
 };
 
 export const FIREBASE_PROVIDER_NAME = 'FIREBASE';

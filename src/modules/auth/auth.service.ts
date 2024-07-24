@@ -58,7 +58,7 @@ export class AuthService {
       registerDto.password,
       this.configService.getOrThrow<TAppConfig>('app').bcryptSalt,
     );
-    registerDto.role = ERole.USER;
+    registerDto.role = registerDto.role ?? ERole.USER;
 
     const newUser = await this.usersService.create(registerDto);
 

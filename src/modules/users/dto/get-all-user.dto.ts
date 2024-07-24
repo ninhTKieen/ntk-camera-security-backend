@@ -14,20 +14,20 @@ export class GetAllUserDto {
   @ApiProperty({ example: 'john_doe' })
   username: string;
 
-  @ApiProperty({ example: '1234567890' })
-  phoneNumber: string;
+  @ApiProperty({ example: '1234567890', nullable: true })
+  phoneNumber?: string;
 
   @ApiProperty({ example: 'http://example.com/image.jpg', nullable: true })
-  imageUrl: string | null;
+  imageUrl?: string;
 
   @ApiProperty({ example: '1234567890', nullable: true })
-  imageUrlId: string;
+  imageUrlId?: string;
 
   @ApiProperty({ example: 'male', nullable: true })
-  gender: EGender | null;
+  gender?: EGender | null;
 
   @ApiProperty({ example: '1990-01-01', nullable: true })
-  dateOfBirth: Date | null;
+  dateOfBirth?: Date;
 
   @ApiProperty({ example: ERole.USER })
   role: ERole;

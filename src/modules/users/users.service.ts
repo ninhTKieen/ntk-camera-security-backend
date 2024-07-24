@@ -6,6 +6,7 @@ import {
   paginate,
 } from 'nestjs-typeorm-paginate';
 import { ERole } from 'src/common/common.enum';
+import { ErrorMessages } from 'src/configs/constant.config';
 import { User } from 'src/entities/user.entity';
 import { Repository } from 'typeorm';
 
@@ -117,6 +118,7 @@ export class UsersService {
     return this.userRepository.save(createUser);
   }
 
+  // Only for user, not for admin
   async update(userInfo: User, id: number, updateUser: UpdateUserDto) {
     const user = await this.findById(id);
 
@@ -124,29 +126,9 @@ export class UsersService {
       throw new HttpException(
         {
           code: HttpStatus.FORBIDDEN,
-          message: 'You are not allowed to access this resource',
+          message: ErrorMessages.NOT_ALLOWED,
         },
         HttpStatus.FORBIDDEN,
-      );
-    }
-
-    if (userInfo.role !== ERole.ADMIN && updateUser.role) {
-      throw new HttpException(
-        {
-          code: HttpStatus.FORBIDDEN,
-          message: 'You are not allowed to access this resource',
-        },
-        HttpStatus.FORBIDDEN,
-      );
-    }
-
-    if (updateUser.role && !Object.values(ERole).includes(updateUser.role)) {
-      throw new HttpException(
-        {
-          code: HttpStatus.BAD_REQUEST,
-          message: 'Role is not valid',
-        },
-        HttpStatus.BAD_REQUEST,
       );
     }
 

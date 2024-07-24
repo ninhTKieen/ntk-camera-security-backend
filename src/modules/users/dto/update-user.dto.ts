@@ -1,62 +1,35 @@
-import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
-import {
-  IsDateString,
-  IsEmail,
-  IsInt,
-  IsOptional,
-  IsString,
-} from 'class-validator';
-import { EGender, ERole } from 'src/common/common.enum';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsDateString, IsOptional, IsString } from 'class-validator';
+import { EGender } from 'src/common/common.enum';
 
 export class UpdateUserDto {
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @IsOptional()
   @IsString()
-  name: string;
+  name?: string;
 
-  @ApiProperty()
-  @IsOptional()
-  @IsEmail()
-  email: string;
-
-  @ApiProperty()
-  @IsOptional()
-  @IsString()
-  username: string;
-
-  @ApiProperty()
-  @IsOptional()
-  @IsString()
-  password: string;
-
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @IsOptional()
   @IsString()
   phoneNumber?: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @IsOptional()
   @IsString()
   imageUrl?: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @IsOptional()
   @IsString()
   imageUrlId?: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @IsOptional()
   @IsString()
   gender?: EGender;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @IsOptional()
   @IsDateString()
   dateOfBirth?: Date;
-
-  @ApiHideProperty()
-  @IsOptional()
-  @IsOptional()
-  @IsInt()
-  role?: ERole;
 }

@@ -5,7 +5,7 @@ import {
   Get,
   Param,
   ParseIntPipe,
-  Put,
+  Patch,
   Query,
   Request,
   UseGuards,
@@ -17,6 +17,7 @@ import {
 } from 'src/common/common-swagger-response.dto';
 import { GetPaginatedDto } from 'src/common/get-paginated.dto';
 
+import { AdminGuard } from '../auth/guards/admin.guard';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { GetAllUserDto } from './dto/get-all-user.dto';
 import { GetDetailUserDto } from './dto/get-detail-user.dto';
@@ -29,7 +30,7 @@ import { UsersService } from './users.service';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, AdminGuard)
   @ApiOperation({ summary: 'Get all users' })
   @Get('/get-all')
   @ApiOkResponsePaginated(GetAllUserDto)
@@ -56,7 +57,7 @@ export class UsersController {
   }
 
   @UseGuards(AuthGuard)
-  @Put(':id')
+  @Patch(':id')
   @ApiOperation({ summary: 'Update user by id' })
   @ApiOkResponseCommon(Boolean)
   update(

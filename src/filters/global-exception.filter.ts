@@ -27,7 +27,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       responseBody = {
         data: false,
         code: exception.getStatus(),
-        message: exception.message,
+        message: exception.getResponse(),
       };
     } else if (exception instanceof QueryFailedError) {
       responseBody = {

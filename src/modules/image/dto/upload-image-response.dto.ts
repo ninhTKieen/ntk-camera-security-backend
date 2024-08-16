@@ -2,13 +2,13 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class UploadImageResponseDto {
   @ApiProperty()
-  id: string;
+  imagePublicId: string;
 
   @ApiProperty()
-  url: string;
+  imagePublicUrl: string;
 
   @ApiProperty()
-  secureUrl: string;
+  imageSecureUrl: string;
 
   @ApiProperty()
   width: number;

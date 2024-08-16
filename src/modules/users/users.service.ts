@@ -10,6 +10,7 @@ import { ErrorMessages } from 'src/configs/constant.config';
 import { User } from 'src/entities/user.entity';
 import { Repository } from 'typeorm';
 
+import { ImageService } from '../image/image.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { GetAllUserDto } from './dto/get-all-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -18,6 +19,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 export class UsersService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
+    private readonly imageService: ImageService,
   ) {}
 
   async findAll(
@@ -130,6 +132,10 @@ export class UsersService {
         },
         HttpStatus.FORBIDDEN,
       );
+    }
+
+    if (updateUser.imageUrl && updateUser.imageUrlId !== user.imageUrlId) {
+      await this.imageService.deleteFile(user.imageUrlId);
     }
 
     const result = await this.userRepository.update(id, updateUser);

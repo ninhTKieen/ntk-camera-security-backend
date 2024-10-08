@@ -1,6 +1,7 @@
 import { EGender, ERole } from 'src/common/common.enum';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
+import { EstateMember } from './estate-member.entity';
 import { FullAuditedEntity } from './full-audited.entity';
 
 @Entity('users')
@@ -37,4 +38,7 @@ export class User extends FullAuditedEntity {
 
   @Column({ type: 'enum', enum: ERole, nullable: false })
   role: ERole;
+
+  @OneToMany(() => EstateMember, (estateMember) => estateMember.user)
+  estateMembers: EstateMember[];
 }

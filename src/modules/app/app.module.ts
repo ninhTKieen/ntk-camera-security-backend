@@ -10,6 +10,7 @@ import { GlobalExceptionFilter } from 'src/filters/global-exception.filter';
 import { ResponseInterceptor } from 'src/interceptors/response.interceptor';
 
 import { AuthModule } from '../auth/auth.module';
+import { EstateModule } from '../estates/estate.module';
 import { FirebaseModule } from '../firebase/firebase.module';
 import { ImageModule } from '../image/image.module';
 import { UsersModule } from '../users/users.module';
@@ -27,6 +28,7 @@ import { AppController } from './app.controller';
     UsersModule,
     ImageModule,
     FirebaseModule,
+    EstateModule,
   ],
   controllers: [AppController],
   providers: [

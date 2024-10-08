@@ -19,3 +19,13 @@ export enum EWebAppType {
   WEB = 'WEB',
   MOBILE = 'MOBILE',
 }
+
+export enum EEstateType {
+  APARTMENT = 'APARTMENT',
+  HOUSE = 'HOUSE',
+  LAND = 'LAND',
+  COMMERCIAL = 'COMMERCIAL',
+  SCHOOL = 'SCHOOL',
+  HOSPITAL = 'HOSPITAL',
+  OTHER = 'OTHER',
+}

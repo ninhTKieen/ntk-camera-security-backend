@@ -3,7 +3,7 @@ import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Estate } from './estate.entity';
 import { User } from './user.entity';
 
-export enum EstateRole {
+export enum EEstateRole {
   OWNER = 'OWNER',
   ADMIN = 'ADMIN',
   NORMAL_USER = 'NORMAL_USER',
@@ -23,6 +23,9 @@ export class EstateMember {
   })
   estate: Estate;
 
-  @Column({ type: 'enum', enum: EstateRole, nullable: false })
-  role: EstateRole;
+  @Column({ type: 'enum', enum: EEstateRole, nullable: false })
+  role: EEstateRole;
+
+  @Column({ type: 'varchar', nullable: true })
+  nickname?: string;
 }

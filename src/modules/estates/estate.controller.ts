@@ -17,6 +17,7 @@ import {
 import { GetPaginatedDto } from 'src/common/get-paginated.dto';
 
 import { AuthGuard } from '../auth/guards/auth.guard';
+import { AddMemberDto } from './dto/add-member.dto';
 import { CreateEstateDto } from './dto/create-estate.dto';
 import { GetAllEstateDto } from './dto/get-all-estate.dto';
 import { GetDetailEstateDto } from './dto/get-detail-estate.dto';
@@ -51,5 +52,18 @@ export class EstateController {
   async createEstate(@Body() createEstateDto: CreateEstateDto, @Request() req) {
     const userInfo = req.user;
     return this.estateService.createEstate(createEstateDto, userInfo.id);
+  }
+
+  @UseGuards(AuthGuard)
+  @Post(':id/add-member')
+  @ApiOperation({ summary: 'Add member to estate' })
+  @ApiOkResponseCommon(Boolean)
+  async addMember(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() addMemberDto: AddMemberDto,
+    @Request() req,
+  ) {
+    const userInfo = req.user;
+    return this.estateService.addMember(id, addMemberDto, userInfo.id);
   }
 }

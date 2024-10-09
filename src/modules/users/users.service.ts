@@ -116,7 +116,39 @@ export class UsersService {
     return qb.getOne();
   }
 
+  async findWithUsername(username: string) {
+    const qb = this.userRepository.createQueryBuilder('user').where({
+      username,
+    });
+
+    return qb.getOne();
+  }
+
+  async findWithUsernameAndEmail(username: string, email: string) {
+    const qb = this.userRepository
+      .createQueryBuilder('user')
+      .where('user.username = :username', { username })
+      .orWhere('user.email = :email', { email });
+
+    return qb.getOne();
+  }
+
   async create(createUser: CreateUserDto) {
+    const user = await this.findWithUsernameAndEmail(
+      createUser.username,
+      createUser.email,
+    );
+
+    if (user) {
+      throw new HttpException(
+        {
+          code: HttpStatus.CONFLICT,
+          message: 'Email already exists',
+        },
+        HttpStatus.CONFLICT,
+      );
+    }
+
     return this.userRepository.save(createUser);
   }
 

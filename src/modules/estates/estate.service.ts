@@ -75,4 +75,47 @@ export class EstateService {
 
     return savedEstate;
   }
+
+  async findById(estateId: number, userId) {
+    console.log('estateId', estateId);
+    console.log('userId', userId);
+    const estate = await this.estateRepository
+      .createQueryBuilder('estate')
+      .leftJoinAndSelect('estate.members', 'member')
+      .leftJoin('member.user', 'user')
+      .addSelect([
+        'user.id',
+        'user.name',
+        'user.email',
+        'user.imageUrl',
+        'user.gender',
+        'user.dateOfBirth',
+      ])
+      .where('estate.id = :estateId', { estateId })
+      .getOne();
+
+    if (!estate) {
+      throw new HttpException(
+        {
+          code: HttpStatus.NOT_FOUND,
+          message: 'Estate not found',
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    const isMember = estate.members.some((member) => member.user.id === userId);
+
+    if (!isMember) {
+      throw new HttpException(
+        {
+          code: HttpStatus.FORBIDDEN,
+          message: 'You are not a member of this estate',
+        },
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    return estate;
+  }
 }

@@ -1,6 +1,7 @@
 import { EEstateType } from 'src/common/common.enum';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
+import { Area } from './area.entity';
 import { EstateMember } from './estate-member.entity';
 import { FullAuditedEntity } from './full-audited.entity';
 
@@ -35,4 +36,7 @@ export class Estate extends FullAuditedEntity {
 
   @OneToMany(() => EstateMember, (estateMember) => estateMember.estate)
   members: EstateMember[];
+
+  @OneToMany(() => Area, (area) => area.estate)
+  areas: Area[];
 }

@@ -1,5 +1,6 @@
 import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { Area } from 'src/entities/area.entity';
 import { EstateMember } from 'src/entities/estate-member.entity';
 import { Estate } from 'src/entities/estate.entity';
 
@@ -10,7 +11,7 @@ import { EstateService } from './estate.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Estate, EstateMember]),
+    TypeOrmModule.forFeature([Estate, EstateMember, Area]),
     forwardRef(() => ImageModule),
     forwardRef(() => UsersModule),
   ],

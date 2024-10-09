@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TConfigs } from 'src/configs';
 import { TDatabaseConfig } from 'src/configs/database.config';
+import { Area } from 'src/entities/area.entity';
 import { EstateMember } from 'src/entities/estate-member.entity';
 import { Estate } from 'src/entities/estate.entity';
 import { FcmToken } from 'src/entities/fcm-token.entity';
@@ -23,7 +24,7 @@ import { DataSource } from 'typeorm';
           configService.getOrThrow<TDatabaseConfig>('database').dbPassword,
         database: configService.getOrThrow<TDatabaseConfig>('database').dbName,
         ssl: configService.getOrThrow<TDatabaseConfig>('database').dbSSl,
-        entities: [User, FcmToken, Estate, EstateMember],
+        entities: [User, FcmToken, Estate, EstateMember, Area],
       }),
       dataSourceFactory: async (options) => {
         return await new DataSource(options).initialize();

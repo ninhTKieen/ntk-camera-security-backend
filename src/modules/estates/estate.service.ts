@@ -9,6 +9,7 @@ import { UsersService } from '../users/users.service';
 import { AddMemberDto } from './dto/add-member.dto';
 import { CreateEstateDto } from './dto/create-estate.dto';
 import { GetAllEstateDto } from './dto/get-all-estate.dto';
+import { UpdateEstateDto } from './dto/update-estate.dto';
 
 @Injectable()
 export class EstateService {
@@ -79,8 +80,6 @@ export class EstateService {
   }
 
   async findById(estateId: number, userId) {
-    console.log('estateId', estateId);
-    console.log('userId', userId);
     const estate = await this.estateRepository
       .createQueryBuilder('estate')
       .leftJoinAndSelect('estate.members', 'member')
@@ -119,6 +118,86 @@ export class EstateService {
     }
 
     return estate;
+  }
+
+  async update(
+    estateId: number,
+    updateEstateDto: UpdateEstateDto,
+    userId: number,
+  ) {
+    const estate = await this.findById(estateId, userId);
+
+    if (!estate) {
+      throw new HttpException(
+        {
+          code: HttpStatus.NOT_FOUND,
+          message: 'Estate not found',
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    const isOwner = estate.members.some(
+      (member) =>
+        member.user.id === userId && member.role === EEstateRole.OWNER,
+    );
+
+    if (!isOwner) {
+      throw new HttpException(
+        {
+          code: HttpStatus.FORBIDDEN,
+          message: 'You are not the owner of this estate',
+        },
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    await this.estateRepository.update(estateId, updateEstateDto);
+
+    return { message: 'Estate updated successfully' };
+  }
+
+  async delete(estateId: number, userId: number) {
+    const estate = await this.findById(estateId, userId);
+
+    if (!estate) {
+      throw new HttpException(
+        {
+          code: HttpStatus.NOT_FOUND,
+          message: 'Estate not found',
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    const isOwner = estate.members.some(
+      (member) =>
+        member.user.id === userId && member.role === EEstateRole.OWNER,
+    );
+
+    if (!isOwner) {
+      throw new HttpException(
+        {
+          code: HttpStatus.FORBIDDEN,
+          message: 'You are not the owner of this estate',
+        },
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    if (estate.members.length > 1) {
+      throw new HttpException(
+        {
+          code: HttpStatus.BAD_REQUEST,
+          message: 'Cannot delete estate with members',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    await this.estateRepository.delete(estateId);
+
+    return { message: 'Estate deleted successfully' };
   }
 
   async addMember(estateId: number, addMember: AddMemberDto, userId: number) {
@@ -168,5 +247,66 @@ export class EstateService {
     });
 
     await this.estateMemberRepository.save(estateMember);
+  }
+
+  async deleteMember(estateId: number, memberId: number, userId: number) {
+    const estate = await this.findById(estateId, userId);
+
+    if (!estate) {
+      throw new HttpException(
+        {
+          code: HttpStatus.NOT_FOUND,
+          message: 'Estate not found',
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    const memberToDelete = estate.members.find(
+      (member) => member.id === memberId,
+    );
+
+    if (!memberToDelete) {
+      throw new HttpException(
+        {
+          code: HttpStatus.NOT_FOUND,
+          message: 'Member not found',
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    // Ensure that only an owner or admin can delete members
+    const isOwnerOrAdmin = estate.members.some(
+      (member) =>
+        member.user.id === userId &&
+        (member.role === EEstateRole.OWNER ||
+          member.role === EEstateRole.ADMIN),
+    );
+
+    if (!isOwnerOrAdmin) {
+      throw new HttpException(
+        {
+          code: HttpStatus.FORBIDDEN,
+          message:
+            'You do not have permission to delete members from this estate',
+        },
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    if (memberToDelete.role === EEstateRole.OWNER) {
+      throw new HttpException(
+        {
+          code: HttpStatus.BAD_REQUEST,
+          message: 'The owner cannot be deleted',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    await this.estateMemberRepository.delete(memberId);
+
+    return { message: 'Member deleted successfully' };
   }
 }

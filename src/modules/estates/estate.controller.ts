@@ -1,9 +1,11 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
   Query,
   Request,
@@ -55,6 +57,28 @@ export class EstateController {
   }
 
   @UseGuards(AuthGuard)
+  @ApiOperation({ summary: 'Update estate' })
+  @Patch(':id')
+  @ApiOkResponseCommon(Boolean)
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateEstateDto: CreateEstateDto,
+    @Request() req,
+  ) {
+    const userInfo = req.user;
+    return this.estateService.update(id, updateEstateDto, userInfo.id);
+  }
+
+  @UseGuards(AuthGuard)
+  @Delete(':id')
+  @ApiOperation({ summary: 'Delete estate' })
+  @ApiOkResponseCommon(Boolean)
+  async remove(@Param('id', ParseIntPipe) id: number, @Request() req) {
+    const userInfo = req.user;
+    return this.estateService.delete(id, userInfo.id);
+  }
+
+  @UseGuards(AuthGuard)
   @Post(':id/add-member')
   @ApiOperation({ summary: 'Add member to estate' })
   @ApiOkResponseCommon(Boolean)
@@ -65,5 +89,18 @@ export class EstateController {
   ) {
     const userInfo = req.user;
     return this.estateService.addMember(id, addMemberDto, userInfo.id);
+  }
+
+  @UseGuards(AuthGuard)
+  @Delete(':id/remove-member/:memberId')
+  @ApiOperation({ summary: 'Remove member from estate' })
+  @ApiOkResponseCommon(Boolean)
+  async removeMember(
+    @Param('id', ParseIntPipe) id: number,
+    @Param('memberId', ParseIntPipe) memberId: number,
+    @Request() req,
+  ) {
+    const userInfo = req.user;
+    return this.estateService.deleteMember(id, memberId, userInfo.id);
   }
 }

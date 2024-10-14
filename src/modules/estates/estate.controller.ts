@@ -23,6 +23,7 @@ import { AddMemberDto } from './dto/add-member.dto';
 import { CreateEstateDto } from './dto/create-estate.dto';
 import { GetAllEstateDto } from './dto/get-all-estate.dto';
 import { GetDetailEstateDto } from './dto/get-detail-estate.dto';
+import { UpdateMemberDto } from './dto/update-member.dto';
 import { EstateService } from './estate.service';
 
 @Controller('api/estates')
@@ -89,6 +90,25 @@ export class EstateController {
   ) {
     const userInfo = req.user;
     return this.estateService.addMember(id, addMemberDto, userInfo.id);
+  }
+
+  @UseGuards(AuthGuard)
+  @Patch(':id/update-member/:memberId')
+  @ApiOperation({ summary: 'Update member in estate' })
+  @ApiOkResponseCommon(Boolean)
+  async updateMember(
+    @Param('id', ParseIntPipe) id: number,
+    @Param('memberId', ParseIntPipe) memberId: number,
+    @Body() updateMemberDto: UpdateMemberDto,
+    @Request() req,
+  ) {
+    const userInfo = req.user;
+    return this.estateService.updateMember(
+      id,
+      memberId,
+      updateMemberDto,
+      userInfo.id,
+    );
   }
 
   @UseGuards(AuthGuard)

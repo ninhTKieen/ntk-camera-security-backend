@@ -10,6 +10,7 @@ import { AddMemberDto } from './dto/add-member.dto';
 import { CreateEstateDto } from './dto/create-estate.dto';
 import { GetAllEstateDto } from './dto/get-all-estate.dto';
 import { UpdateEstateDto } from './dto/update-estate.dto';
+import { UpdateMemberDto } from './dto/update-member.dto';
 
 @Injectable()
 export class EstateService {
@@ -247,6 +248,59 @@ export class EstateService {
     });
 
     await this.estateMemberRepository.save(estateMember);
+  }
+
+  async updateMember(
+    estateId: number,
+    memberId: number,
+    updateMember: UpdateMemberDto,
+    userId: number,
+  ) {
+    const estate = await this.findById(estateId, userId);
+
+    if (!estate) {
+      throw new HttpException(
+        {
+          code: HttpStatus.NOT_FOUND,
+          message: 'Estate not found',
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    const memberToUpdate = estate.members.find(
+      (member) => member.id === memberId,
+    );
+
+    if (!memberToUpdate) {
+      throw new HttpException(
+        {
+          code: HttpStatus.NOT_FOUND,
+          message: 'Member not found',
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    const isOwnerOrAdmin = estate.members.some(
+      (member) =>
+        member.user.id === userId &&
+        (member.role === EEstateRole.OWNER ||
+          member.role === EEstateRole.ADMIN),
+    );
+
+    if (!isOwnerOrAdmin) {
+      throw new HttpException(
+        {
+          code: HttpStatus.FORBIDDEN,
+          message:
+            'You do not have permission to update members in this estate',
+        },
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    await this.estateMemberRepository.update(memberId, updateMember);
   }
 
   async deleteMember(estateId: number, memberId: number, userId: number) {

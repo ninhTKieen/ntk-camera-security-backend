@@ -19,7 +19,19 @@ export class Device extends FullAuditedEntity {
   ipCamera: string;
 
   @Column({ nullable: true })
+  rtsp: string;
+
+  @Column({ nullable: true })
   model: string;
+
+  @Column({ nullable: true })
+  serial: string;
+
+  @Column({ nullable: true })
+  brand: string;
+
+  @Column({ nullable: true })
+  mac: string;
 
   @ManyToOne(() => Estate, (estate) => estate.devices, {
     nullable: false,

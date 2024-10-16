@@ -1,14 +1,17 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IPaginationOptions, paginate } from 'nestjs-typeorm-paginate';
+import { Area } from 'src/entities/area.entity';
 import { EEstateRole, EstateMember } from 'src/entities/estate-member.entity';
 import { Estate } from 'src/entities/estate.entity';
 import { Repository } from 'typeorm';
 
 import { UsersService } from '../users/users.service';
 import { AddMemberDto } from './dto/add-member.dto';
+import { CreateAreaDto } from './dto/create-area.dto';
 import { CreateEstateDto } from './dto/create-estate.dto';
 import { GetAllEstateDto } from './dto/get-all-estate.dto';
+import { UpdateAreaDto } from './dto/update-area.dto';
 import { UpdateEstateDto } from './dto/update-estate.dto';
 import { UpdateMemberDto } from './dto/update-member.dto';
 
@@ -20,6 +23,9 @@ export class EstateService {
 
     @InjectRepository(EstateMember)
     private readonly estateMemberRepository: Repository<EstateMember>,
+
+    @InjectRepository(Area)
+    private readonly areaRepository: Repository<Area>,
 
     private readonly userService: UsersService,
   ) {}
@@ -93,6 +99,7 @@ export class EstateService {
         'user.gender',
         'user.dateOfBirth',
       ])
+      .leftJoinAndSelect('estate.areas', 'area')
       .where('estate.id = :estateId', { estateId })
       .getOne();
 
@@ -118,7 +125,10 @@ export class EstateService {
       );
     }
 
-    return estate;
+    return {
+      ...estate,
+      role: estate.members.find((member) => member.user.id === userId).role,
+    };
   }
 
   async update(
@@ -362,5 +372,144 @@ export class EstateService {
     await this.estateMemberRepository.delete(memberId);
 
     return { message: 'Member deleted successfully' };
+  }
+
+  async addArea(estateId: number, area: CreateAreaDto, userId: number) {
+    const estate = await this.findById(estateId, userId);
+
+    if (!estate) {
+      throw new HttpException(
+        {
+          code: HttpStatus.NOT_FOUND,
+          message: 'Estate not found',
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    const isOwnerOrAdmin = estate.members.some(
+      (member) =>
+        member.user.id === userId &&
+        (member.role === EEstateRole.OWNER ||
+          member.role === EEstateRole.ADMIN),
+    );
+
+    if (!isOwnerOrAdmin) {
+      throw new HttpException(
+        {
+          code: HttpStatus.FORBIDDEN,
+          message: 'You do not have permission to add areas to this estate',
+        },
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    const newArea = this.areaRepository.create({
+      ...area,
+      estate,
+    });
+
+    await this.areaRepository.save(newArea);
+
+    return { message: 'Area added successfully' };
+  }
+
+  async updateArea(
+    estateId: number,
+    areaId: number,
+    updateArea: UpdateAreaDto,
+    userId: number,
+  ) {
+    const estate = await this.findById(estateId, userId);
+
+    if (!estate) {
+      throw new HttpException(
+        {
+          code: HttpStatus.NOT_FOUND,
+          message: 'Estate not found',
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    const areaToUpdate = estate.areas.find((area) => area.id === areaId);
+
+    if (!areaToUpdate) {
+      throw new HttpException(
+        {
+          code: HttpStatus.NOT_FOUND,
+          message: 'Area not found',
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    const isOwnerOrAdmin = estate.members.some(
+      (member) =>
+        member.user.id === userId &&
+        (member.role === EEstateRole.OWNER ||
+          member.role === EEstateRole.ADMIN),
+    );
+
+    if (!isOwnerOrAdmin) {
+      throw new HttpException(
+        {
+          code: HttpStatus.FORBIDDEN,
+          message: 'You do not have permission to update areas in this estate',
+        },
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    await this.areaRepository.update(areaId, updateArea);
+
+    return { message: 'Area updated successfully' };
+  }
+
+  async deleteArea(estateId: number, areaId: number, userId: number) {
+    const estate = await this.findById(estateId, userId);
+
+    if (!estate) {
+      throw new HttpException(
+        {
+          code: HttpStatus.NOT_FOUND,
+          message: 'Estate not found',
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    const areaToDelete = estate.areas.find((area) => area.id === areaId);
+
+    if (!areaToDelete) {
+      throw new HttpException(
+        {
+          code: HttpStatus.NOT_FOUND,
+          message: 'Area not found',
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    const isOwnerOrAdmin = estate.members.some(
+      (member) =>
+        member.user.id === userId &&
+        (member.role === EEstateRole.OWNER ||
+          member.role === EEstateRole.ADMIN),
+    );
+
+    if (!isOwnerOrAdmin) {
+      throw new HttpException(
+        {
+          code: HttpStatus.FORBIDDEN,
+          message: 'You do not have permission to delete areas in this estate',
+        },
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    await this.areaRepository.delete(areaId);
+
+    return { message: 'Area deleted successfully' };
   }
 }

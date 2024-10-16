@@ -20,9 +20,11 @@ import { GetPaginatedDto } from 'src/common/get-paginated.dto';
 
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { AddMemberDto } from './dto/add-member.dto';
+import { CreateAreaDto } from './dto/create-area.dto';
 import { CreateEstateDto } from './dto/create-estate.dto';
 import { GetAllEstateDto } from './dto/get-all-estate.dto';
 import { GetDetailEstateDto } from './dto/get-detail-estate.dto';
+import { UpdateAreaDto } from './dto/update-area.dto';
 import { UpdateMemberDto } from './dto/update-member.dto';
 import { EstateService } from './estate.service';
 
@@ -122,5 +124,45 @@ export class EstateController {
   ) {
     const userInfo = req.user;
     return this.estateService.deleteMember(id, memberId, userInfo.id);
+  }
+
+  @UseGuards(AuthGuard)
+  @Post(':id/add-area')
+  @ApiOperation({ summary: 'Add area to estate' })
+  @ApiOkResponseCommon(Boolean)
+  async addArea(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() area: CreateAreaDto,
+    @Request() req,
+  ) {
+    const userInfo = req.user;
+    return this.estateService.addArea(id, area, userInfo.id);
+  }
+
+  @UseGuards(AuthGuard)
+  @Patch(':id/update-area/:areaId')
+  @ApiOperation({ summary: 'Update area in estate' })
+  @ApiOkResponseCommon(Boolean)
+  async updateArea(
+    @Param('id', ParseIntPipe) id: number,
+    @Param('areaId', ParseIntPipe) areaId: number,
+    @Body() area: UpdateAreaDto,
+    @Request() req,
+  ) {
+    const userInfo = req.user;
+    return this.estateService.updateArea(id, areaId, area, userInfo.id);
+  }
+
+  @UseGuards(AuthGuard)
+  @Delete(':id/remove-area/:areaId')
+  @ApiOperation({ summary: 'Remove area from estate' })
+  @ApiOkResponseCommon(Boolean)
+  async removeArea(
+    @Param('id', ParseIntPipe) id: number,
+    @Param('areaId', ParseIntPipe) areaId: number,
+    @Request() req,
+  ) {
+    const userInfo = req.user;
+    return this.estateService.deleteArea(id, areaId, userInfo.id);
   }
 }

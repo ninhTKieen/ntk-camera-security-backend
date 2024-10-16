@@ -29,3 +29,8 @@ export enum EEstateType {
   HOSPITAL = 'HOSPITAL',
   OTHER = 'OTHER',
 }
+
+export enum EOrder {
+  ASC = 'ASC',
+  DESC = 'DESC',
+}

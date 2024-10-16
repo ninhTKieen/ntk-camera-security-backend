@@ -2,6 +2,8 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsInt, IsOptional, IsString } from 'class-validator';
 
+import { EOrder } from './common.enum';
+
 export class GetPaginatedDto {
   @IsInt()
   @IsOptional()
@@ -40,4 +42,14 @@ export class GetPaginatedDto {
     required: false,
   })
   sort?: string = '';
+
+  @IsString()
+  @IsOptional()
+  @ApiProperty({
+    type: String,
+    default: 'ASC',
+    required: false,
+    enum: EOrder,
+  })
+  order?: EOrder = EOrder.ASC;
 }

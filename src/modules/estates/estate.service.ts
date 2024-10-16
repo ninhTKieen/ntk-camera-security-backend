@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { IPaginationOptions, paginate } from 'nestjs-typeorm-paginate';
+import { paginate } from 'nestjs-typeorm-paginate';
+import { GetPaginatedDto } from 'src/common/get-paginated.dto';
 import { Area } from 'src/entities/area.entity';
 import { EEstateRole, EstateMember } from 'src/entities/estate-member.entity';
 import { Estate } from 'src/entities/estate.entity';
@@ -30,7 +31,7 @@ export class EstateService {
     private readonly userService: UsersService,
   ) {}
 
-  async findAll(userId: number, options: IPaginationOptions) {
+  async findAll(userId: number, options: GetPaginatedDto) {
     const user = await this.userService.findById(userId);
 
     if (!user) {
@@ -53,7 +54,14 @@ export class EstateService {
       .createQueryBuilder('estate')
       .leftJoin('estate.members', 'member')
       .where('member.userId = :userId', { userId })
-      .select(columns);
+      .select(columns)
+      .orderBy(options.sort, options.order);
+
+    if (options.search) {
+      qb.andWhere('estate.name ILIKE :search', {
+        search: `%${options.search}%`,
+      });
+    }
 
     return paginate<GetAllEstateDto>(qb, options);
   }

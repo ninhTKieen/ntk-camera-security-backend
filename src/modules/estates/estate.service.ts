@@ -100,6 +100,7 @@ export class EstateService {
         'user.dateOfBirth',
       ])
       .leftJoinAndSelect('estate.areas', 'area')
+      .leftJoinAndSelect('estate.devices', 'device')
       .where('estate.id = :estateId', { estateId })
       .getOne();
 

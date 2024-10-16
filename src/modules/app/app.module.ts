@@ -6,6 +6,7 @@ import authConfig from 'src/configs/auth.config';
 import databaseConfig from 'src/configs/database.config';
 import firebaseConfig from 'src/configs/firebase.config';
 import { DatabaseModule } from 'src/database/database.module';
+import { DevicesModule } from 'src/devices/devices.module';
 import { GlobalExceptionFilter } from 'src/filters/global-exception.filter';
 import { ResponseInterceptor } from 'src/interceptors/response.interceptor';
 
@@ -29,6 +30,7 @@ import { AppController } from './app.controller';
     ImageModule,
     FirebaseModule,
     EstateModule,
+    DevicesModule,
   ],
   controllers: [AppController],
   providers: [

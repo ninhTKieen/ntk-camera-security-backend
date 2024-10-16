@@ -15,7 +15,7 @@ export class Device extends FullAuditedEntity {
   @Column({ type: 'varchar', length: 255, nullable: true })
   description: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', length: 255 })
   ipCamera: string;
 
   @Column({ nullable: true })

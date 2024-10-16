@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsInt, IsOptional } from 'class-validator';
+import { IsInt, IsOptional, IsString } from 'class-validator';
 
 export class GetPaginatedDto {
   @IsInt()
@@ -20,4 +20,24 @@ export class GetPaginatedDto {
     default: 1,
   })
   page: number = 1;
+
+  @IsString()
+  @IsOptional()
+  @Type(() => String)
+  @ApiProperty({
+    type: String,
+    default: '',
+    required: false,
+  })
+  search?: string = '';
+
+  @IsString()
+  @IsOptional()
+  @Type(() => String)
+  @ApiProperty({
+    type: String,
+    default: '',
+    required: false,
+  })
+  sort?: string = '';
 }

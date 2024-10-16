@@ -41,7 +41,7 @@ export class DevicesController {
   @ApiOkResponseCommon(Device)
   findAll(@Query() input: GetListDeviceDto, @Request() req) {
     const userInfo = req.user;
-    return this.devicesService.findAll(input.estateId, userInfo.id);
+    return this.devicesService.findAll(input, userInfo.id);
   }
 
   @Get(':id')

@@ -1,5 +1,12 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
+import { Device } from './device.entity';
 import { Estate } from './estate.entity';
 import { FullAuditedEntity } from './full-audited.entity';
 
@@ -19,4 +26,7 @@ export class Area extends FullAuditedEntity {
     onDelete: 'CASCADE',
   })
   estate: Estate;
+
+  @OneToMany(() => Device, (device) => device.area)
+  devices: Device[];
 }

@@ -48,21 +48,26 @@ export class DevicesService {
       area,
     });
 
-    return device;
+    return {
+      code: HttpStatus.OK,
+      message: 'Create device success',
+      data: device,
+    };
   }
 
   async findAll(input: GetListDeviceDto, userId: number) {
     const { estateId, areaId } = input;
-    console.log('estateId', estateId);
     await this.estateService.findById(estateId, userId);
 
     const qb = this.deviceRepository
       .createQueryBuilder('device')
       .where('device.estateId = :estateId', { estateId })
+      .orderBy('device.id', 'DESC')
       .leftJoin('device.estate', 'estate')
       .addSelect(['estate.id', 'estate.name'])
       .leftJoin('device.area', 'area')
-      .addSelect(['area.id', 'area.name']);
+      .addSelect(['area.id', 'area.name'])
+      .orderBy(input.sort, input.order);
 
     if (input.search) {
       qb.andWhere('device.name LIKE :search', {
@@ -74,21 +79,98 @@ export class DevicesService {
       qb.where('device.areaId = :areaId', { areaId });
     }
 
-    qb.orderBy(input.sort, input.order);
-
     return paginate<Device>(qb, input);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} device`;
+  async findOne(id: number, userId: number) {
+    const device = await this.deviceRepository
+      .createQueryBuilder('device')
+      .leftJoin('device.estate', 'estate')
+      .addSelect(['estate.id', 'estate.name'])
+      .leftJoinAndSelect('estate.members', 'member')
+      .leftJoin('member.user', 'user')
+      .addSelect(['user.id', 'user.email'])
+      .leftJoin('device.area', 'area')
+      .addSelect(['area.id', 'area.name'])
+      .where('device.id = :id', { id })
+      .getOne();
+
+    if (!device) {
+      throw new HttpException(
+        {
+          code: HttpStatus.NOT_FOUND,
+          message: 'Device not found',
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    const isMember = device.estate.members.some(
+      (member) => member.user.id === userId,
+    );
+
+    if (!isMember) {
+      throw new HttpException(
+        {
+          code: HttpStatus.FORBIDDEN,
+          message: 'You do not have permission to access this device',
+        },
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    return device;
   }
 
-  update(id: number, updateDeviceDto: UpdateDeviceDto) {
-    console.log('updateDeviceDto', updateDeviceDto);
-    return `This action updates a #${id} device`;
+  async update(id: number, updateDeviceDto: UpdateDeviceDto, userId: number) {
+    const device = await this.findOne(id, userId);
+
+    const members = device.estate.members;
+
+    const isOwnerOrAdmin = members.some(
+      (member) =>
+        member.user.id === userId &&
+        (member.role === 'OWNER' || member.role === 'ADMIN'),
+    );
+
+    if (!isOwnerOrAdmin) {
+      throw new HttpException(
+        {
+          code: HttpStatus.FORBIDDEN,
+          message: 'You do not have permission to update this device',
+        },
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    this.deviceRepository.update(id, updateDeviceDto);
+
+    return true;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} device`;
+  async remove(id: number, userId: number) {
+    const device = await this.findOne(id, userId);
+
+    const members = device.estate.members;
+
+    const isOwnerOrAdmin = members.some(
+      (member) =>
+        member.user.id === userId &&
+        (member.role === 'OWNER' || member.role === 'ADMIN'),
+    );
+
+    if (!isOwnerOrAdmin) {
+      throw new HttpException(
+        {
+          code: HttpStatus.FORBIDDEN,
+          message: 'You do not have permission to delete this device',
+        },
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    this.deviceRepository.delete(id);
+
+    return true;
   }
 }

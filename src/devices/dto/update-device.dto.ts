@@ -1,5 +1,44 @@
-import { PartialType } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsOptional, IsString } from 'class-validator';
 
-import { CreateDeviceDto } from './create-device.dto';
+export class UpdateDeviceDto {
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  name: string;
 
-export class UpdateDeviceDto extends PartialType(CreateDeviceDto) {}
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  ipCamera: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  description?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  rtsp: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  model: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  serial: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  brand: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  mac: string;
+}

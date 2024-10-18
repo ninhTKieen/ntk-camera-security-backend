@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
   Query,
@@ -44,18 +45,32 @@ export class DevicesController {
     return this.devicesService.findAll(input, userInfo.id);
   }
 
+  @UseGuards(AuthGuard)
+  @ApiOperation({ summary: 'Get device by id' })
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.devicesService.findOne(+id);
+  @ApiOkResponseCommon(Device)
+  findOne(@Param('id', ParseIntPipe) id: number, @Request() req) {
+    const userInfo = req.user;
+    return this.devicesService.findOne(id, userInfo.id);
   }
 
+  @UseGuards(AuthGuard)
+  @ApiOperation({ summary: 'Update device by id' })
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateDeviceDto: UpdateDeviceDto) {
-    return this.devicesService.update(+id, updateDeviceDto);
+  @ApiOkResponseCommon(Boolean)
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateDeviceDto: UpdateDeviceDto,
+    @Request() req,
+  ) {
+    const userInfo = req.user;
+    return this.devicesService.update(id, updateDeviceDto, userInfo.id);
   }
 
+  @UseGuards(AuthGuard)
+  @ApiOperation({ summary: 'Delete device by id' })
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.devicesService.remove(+id);
+  remove(@Param('id', ParseIntPipe) id: number, @Request() req) {
+    return this.devicesService.remove(id, req.user.id);
   }
 }

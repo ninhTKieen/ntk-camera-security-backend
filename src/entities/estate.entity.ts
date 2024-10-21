@@ -24,7 +24,7 @@ export class Estate extends FullAuditedEntity {
   imageUrls: string[];
 
   @Column('simple-array', { nullable: true })
-  imageUrlIds: number[];
+  imageUrlIds: string[];
 
   @Column({ type: 'decimal', precision: 10, scale: 7, nullable: true })
   long: number;

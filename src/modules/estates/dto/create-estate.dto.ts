@@ -34,8 +34,7 @@ export class CreateEstateDto {
   @ApiProperty({ type: [Number], description: 'Array of image URL IDs' })
   @IsOptional()
   @IsArray()
-  @IsNumber({}, { each: true })
-  imageUrlIds?: number[];
+  imageUrlIds?: string[];
 
   @ApiProperty({ description: 'Longitude of the estate' })
   @IsOptional()

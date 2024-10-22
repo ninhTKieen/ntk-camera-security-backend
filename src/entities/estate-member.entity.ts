@@ -9,6 +9,12 @@ export enum EEstateRole {
   NORMAL_USER = 'NORMAL_USER',
 }
 
+export enum EEstateMemberStatus {
+  JOINED = 'JOINED',
+  PENDING = 'PENDING',
+  BLOCKED = 'BLOCKED',
+}
+
 @Entity('estate_members')
 export class EstateMember {
   @PrimaryGeneratedColumn()
@@ -19,13 +25,15 @@ export class EstateMember {
 
   @ManyToOne(() => Estate, (estate) => estate.members, {
     nullable: false,
-    onDelete: 'CASCADE',
   })
   estate: Estate;
 
-  @Column({ type: 'enum', enum: EEstateRole, nullable: false })
+  @Column({ type: 'enum', enum: EEstateRole })
   role: EEstateRole;
 
   @Column({ type: 'varchar', nullable: true })
   nickname?: string;
+
+  @Column({ type: 'enum', enum: EEstateMemberStatus, nullable: true })
+  status: EEstateMemberStatus;
 }

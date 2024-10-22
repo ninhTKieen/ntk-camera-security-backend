@@ -82,16 +82,28 @@ export class EstateController {
   }
 
   @UseGuards(AuthGuard)
-  @Post(':id/add-member')
-  @ApiOperation({ summary: 'Add member to estate' })
+  @Post(':id/invite-member')
+  @ApiOperation({ summary: 'Invite member to estate' })
   @ApiOkResponseCommon(Boolean)
-  async addMember(
+  async inviteMember(
     @Param('id', ParseIntPipe) id: number,
     @Body() addMemberDto: AddMemberDto,
     @Request() req,
   ) {
     const userInfo = req.user;
-    return this.estateService.addMember(id, addMemberDto, userInfo.id);
+    return this.estateService.inviteMember(id, addMemberDto, userInfo.id);
+  }
+
+  @UseGuards(AuthGuard)
+  @Post(':id/accept-invitation')
+  @ApiOperation({ summary: 'Accept invitation to estate' })
+  @ApiOkResponseCommon(Boolean)
+  async acceptInvitation(
+    @Param('id', ParseIntPipe) id: number,
+    @Request() req,
+  ) {
+    const userInfo = req.user;
+    return this.estateService.acceptInvitation(id, userInfo.id);
   }
 
   @UseGuards(AuthGuard)

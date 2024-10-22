@@ -3,7 +3,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { paginate } from 'nestjs-typeorm-paginate';
 import { GetPaginatedDto } from 'src/common/get-paginated.dto';
 import { Area } from 'src/entities/area.entity';
-import { EEstateRole, EstateMember } from 'src/entities/estate-member.entity';
+import {
+  EEstateMemberStatus,
+  EEstateRole,
+  EstateMember,
+} from 'src/entities/estate-member.entity';
 import { Estate } from 'src/entities/estate.entity';
 import { Repository } from 'typeorm';
 
@@ -44,17 +48,13 @@ export class EstateService {
       );
     }
 
-    const metadata = this.estateRepository.metadata;
-
-    const columns = metadata.columns.map(
-      (column) => `estate.${column.propertyName}`,
-    );
-
     const qb = this.estateRepository
       .createQueryBuilder('estate')
-      .leftJoin('estate.members', 'member')
+      .leftJoin('estate.members', 'member', 'member.userId = :userId', {
+        userId,
+      })
+      .addSelect(['member.role', 'member.status'])
       .where('member.userId = :userId', { userId })
-      .select(columns)
       .orderBy(options.sort, options.order);
 
     if (options.search) {
@@ -63,7 +63,21 @@ export class EstateService {
       });
     }
 
-    return paginate<GetAllEstateDto>(qb, options);
+    const paginatedResults = await paginate<GetAllEstateDto>(qb, options);
+
+    console.log('paginatedResults', paginatedResults.items);
+
+    const modifiedResults = paginatedResults.items.map((estate) => {
+      const userRole = estate.members?.[0]?.role || null;
+      const userStatus = estate.members?.[0]?.status || null;
+      delete estate.members;
+      return { ...estate, role: userRole, status: userStatus };
+    });
+
+    return {
+      ...paginatedResults,
+      items: modifiedResults,
+    };
   }
 
   async createEstate(createEstateDto: CreateEstateDto, userId: number) {
@@ -80,13 +94,14 @@ export class EstateService {
     }
 
     const estate = this.estateRepository.create(createEstateDto);
-    const savedEstate = await this.estateRepository.save(estate); // This will generate the estate's id
+    const savedEstate = await this.estateRepository.save(estate);
 
     const estateMember = this.estateMemberRepository.create({
       user,
       estate: savedEstate,
       role: EEstateRole.OWNER,
       nickname: user.name,
+      status: EEstateMemberStatus.JOINED,
     });
 
     await this.estateMemberRepository.save(estateMember);
@@ -220,7 +235,11 @@ export class EstateService {
     return { message: 'Estate deleted successfully' };
   }
 
-  async addMember(estateId: number, addMember: AddMemberDto, userId: number) {
+  async inviteMember(
+    estateId: number,
+    addMember: AddMemberDto,
+    userId: number,
+  ) {
     const estate = await this.findById(estateId, userId);
 
     if (!estate) {
@@ -259,14 +278,86 @@ export class EstateService {
       );
     }
 
+    const isInvited = estate.members.some(
+      (estateMember) =>
+        estateMember.user.username === addMember.username &&
+        estateMember.status === EEstateMemberStatus.PENDING,
+    );
+    if (isInvited) {
+      throw new HttpException(
+        {
+          code: HttpStatus.BAD_REQUEST,
+          message: 'User is already invited to this estate',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const isJoined = estate.members.some(
+      (estateMember) =>
+        estateMember.user.username === addMember.username &&
+        estateMember.status === EEstateMemberStatus.JOINED,
+    );
+
+    if (isJoined) {
+      throw new HttpException(
+        {
+          code: HttpStatus.BAD_REQUEST,
+          message: 'User is already a member of this estate',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
     const estateMember = this.estateMemberRepository.create({
       user: member,
       estate,
       role: addMember.role,
       nickname: addMember.nickname,
+      status: EEstateMemberStatus.PENDING,
     });
 
     await this.estateMemberRepository.save(estateMember);
+  }
+
+  async acceptInvitation(estateId: number, userId: number) {
+    const estate = await this.findById(estateId, userId);
+
+    if (!estate) {
+      throw new HttpException(
+        {
+          code: HttpStatus.NOT_FOUND,
+          message: 'Estate not found',
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    const member = estate.members.find((member) => member.user.id === userId);
+
+    if (!member) {
+      throw new HttpException(
+        {
+          code: HttpStatus.NOT_FOUND,
+          message: 'Member not found',
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    if (member.status !== EEstateMemberStatus.PENDING) {
+      throw new HttpException(
+        {
+          code: HttpStatus.BAD_REQUEST,
+          message: 'User is already a member of this estate',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    member.status = EEstateMemberStatus.JOINED;
+
+    await this.estateMemberRepository.save(member);
   }
 
   async updateMember(

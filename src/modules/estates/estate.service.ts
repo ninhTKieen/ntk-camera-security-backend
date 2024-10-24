@@ -65,8 +65,6 @@ export class EstateService {
 
     const paginatedResults = await paginate<GetAllEstateDto>(qb, options);
 
-    console.log('paginatedResults', paginatedResults.items);
-
     const modifiedResults = paginatedResults.items.map((estate) => {
       const userRole = estate.members?.[0]?.role || null;
       const userStatus = estate.members?.[0]?.status || null;

@@ -156,6 +156,8 @@ export class UsersService {
   async update(userInfo: User, id: number, updateUser: UpdateUserDto) {
     const user = await this.findById(id);
 
+    console.log(userInfo);
+
     if (userInfo.role !== ERole.ADMIN && userInfo.id !== user.id) {
       throw new HttpException(
         {
@@ -166,7 +168,11 @@ export class UsersService {
       );
     }
 
-    if (updateUser.imageUrl && updateUser.imageUrlId !== user.imageUrlId) {
+    if (
+      updateUser.imageUrl &&
+      updateUser.imageUrlId !== user.imageUrlId &&
+      user.imageUrlId
+    ) {
       await this.imageService.deleteFile(user.imageUrlId);
     }
 

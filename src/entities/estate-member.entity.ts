@@ -1,19 +1,8 @@
+import { EEstateMemberStatus, EEstateRole } from 'src/common/common.enum';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 import { Estate } from './estate.entity';
 import { User } from './user.entity';
-
-export enum EEstateRole {
-  OWNER = 'OWNER',
-  ADMIN = 'ADMIN',
-  NORMAL_USER = 'NORMAL_USER',
-}
-
-export enum EEstateMemberStatus {
-  JOINED = 'JOINED',
-  PENDING = 'PENDING',
-  BLOCKED = 'BLOCKED',
-}
 
 @Entity('estate_members')
 export class EstateMember {

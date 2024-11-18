@@ -1,13 +1,10 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { paginate } from 'nestjs-typeorm-paginate';
+import { EEstateMemberStatus, EEstateRole } from 'src/common/common.enum';
 import { GetPaginatedDto } from 'src/common/get-paginated.dto';
 import { Area } from 'src/entities/area.entity';
-import {
-  EEstateMemberStatus,
-  EEstateRole,
-  EstateMember,
-} from 'src/entities/estate-member.entity';
+import { EstateMember } from 'src/entities/estate-member.entity';
 import { Estate } from 'src/entities/estate.entity';
 import { Repository } from 'typeorm';
 

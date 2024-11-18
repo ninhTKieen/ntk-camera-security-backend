@@ -34,3 +34,15 @@ export enum EOrder {
   ASC = 'ASC',
   DESC = 'DESC',
 }
+
+export enum EEstateRole {
+  OWNER = 'OWNER',
+  ADMIN = 'ADMIN',
+  NORMAL_USER = 'NORMAL_USER',
+}
+
+export enum EEstateMemberStatus {
+  JOINED = 'JOINED',
+  PENDING = 'PENDING',
+  BLOCKED = 'BLOCKED',
+}

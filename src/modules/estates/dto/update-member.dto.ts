@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString } from 'class-validator';
-import { EEstateRole } from 'src/entities/estate-member.entity';
+import { EEstateRole } from 'src/common/common.enum';
 
 export class UpdateMemberDto {
   @ApiProperty({ required: false })

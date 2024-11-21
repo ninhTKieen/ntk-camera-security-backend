@@ -28,7 +28,7 @@ export class DevicesController {
   constructor(private readonly devicesService: DevicesService) {}
 
   @UseGuards(AuthGuard)
-  @ApiOperation({ summary: 'Create area' })
+  @ApiOperation({ summary: 'Create device' })
   @Post('/create')
   @ApiOkResponseCommon(Boolean)
   create(@Body() createDeviceDto: CreateDeviceDto, @Request() req) {

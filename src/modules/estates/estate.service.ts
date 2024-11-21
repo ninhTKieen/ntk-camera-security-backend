@@ -355,6 +355,36 @@ export class EstateService {
     await this.estateMemberRepository.save(member);
   }
 
+  async rejectInvitation(estateId: number, userId: number) {
+    const estate = await this.findById(estateId, userId);
+
+    if (!estate) {
+      throw new HttpException(
+        {
+          code: HttpStatus.NOT_FOUND,
+          message: 'Estate not found',
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    const member = estate.members.find((member) => member.user.id === userId);
+
+    if (!member) {
+      throw new HttpException(
+        {
+          code: HttpStatus.NOT_FOUND,
+          message: 'Member not found',
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    await this.estateMemberRepository.delete(member.id);
+
+    return { message: 'Invitation rejected successfully' };
+  }
+
   async updateMember(
     estateId: number,
     memberId: number,

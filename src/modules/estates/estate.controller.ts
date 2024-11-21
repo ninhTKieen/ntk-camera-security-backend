@@ -107,6 +107,18 @@ export class EstateController {
   }
 
   @UseGuards(AuthGuard)
+  @Post(':id/reject-invitation')
+  @ApiOperation({ summary: 'Reject invitation to estate' })
+  @ApiOkResponseCommon(Boolean)
+  async rejectInvitation(
+    @Param('id', ParseIntPipe) id: number,
+    @Request() req,
+  ) {
+    const userInfo = req.user;
+    return this.estateService.rejectInvitation(id, userInfo.id);
+  }
+
+  @UseGuards(AuthGuard)
   @Patch(':id/update-member/:memberId')
   @ApiOperation({ summary: 'Update member in estate' })
   @ApiOkResponseCommon(Boolean)

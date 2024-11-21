@@ -156,8 +156,6 @@ export class UsersService {
   async update(userInfo: User, id: number, updateUser: UpdateUserDto) {
     const user = await this.findById(id);
 
-    console.log(userInfo);
-
     if (userInfo.role !== ERole.ADMIN && userInfo.id !== user.id) {
       throw new HttpException(
         {

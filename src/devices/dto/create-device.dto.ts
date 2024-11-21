@@ -10,7 +10,7 @@ export class CreateDeviceDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  ipCamera: string;
+  streamLink: string;
 
   @ApiProperty()
   @IsNumber()

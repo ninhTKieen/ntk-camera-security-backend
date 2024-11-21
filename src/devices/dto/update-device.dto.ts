@@ -10,7 +10,7 @@ export class UpdateDeviceDto {
   @ApiProperty({ required: false })
   @IsOptional()
   @IsString()
-  ipCamera: string;
+  streamLink: string;
 
   @ApiProperty({ required: false })
   @IsOptional()

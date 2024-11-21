@@ -16,10 +16,7 @@ export class Device extends FullAuditedEntity {
   description: string;
 
   @Column({ type: 'varchar', length: 255 })
-  ipCamera: string;
-
-  @Column({ nullable: true })
-  rtsp: string;
+  streamLink: string;
 
   @Column({ nullable: true })
   model: string;

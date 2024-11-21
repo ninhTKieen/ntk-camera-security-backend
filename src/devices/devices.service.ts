@@ -24,23 +24,24 @@ export class DevicesService {
       userId,
     );
 
-    const isHaveArea = estate.areas.some(
-      (area) => area.id === createDeviceDto?.areaId,
-    );
-
-    if (!isHaveArea) {
-      throw new HttpException(
-        {
-          code: HttpStatus.NOT_FOUND,
-          message: 'This area is not belong to this estate',
-        },
-        HttpStatus.NOT_FOUND,
+    let area = null;
+    if (createDeviceDto.areaId) {
+      const isHaveArea = estate.areas.some(
+        (area) => area.id === createDeviceDto.areaId,
       );
-    }
 
-    const area = estate.areas.find(
-      (area) => area.id === createDeviceDto?.areaId,
-    );
+      if (!isHaveArea) {
+        throw new HttpException(
+          {
+            code: HttpStatus.NOT_FOUND,
+            message: 'This area is not belong to this estate',
+          },
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      area = estate.areas.find((area) => area.id === createDeviceDto.areaId);
+    }
 
     const device = this.deviceRepository.save({
       ...createDeviceDto,

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsOptional, IsString } from 'class-validator';
 
 export class UpdateDeviceDto {
   @ApiProperty({ required: false })
@@ -41,4 +41,9 @@ export class UpdateDeviceDto {
   @IsOptional()
   @IsString()
   mac: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsBoolean()
+  faceRecognitionEnabled: boolean;
 }

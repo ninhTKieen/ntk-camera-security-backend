@@ -1,8 +1,15 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 import { Area } from './area.entity';
 import { Estate } from './estate.entity';
 import { FullAuditedEntity } from './full-audited.entity';
+import { RecognizedFace } from './recognized-face.entity';
 
 @Entity('devices')
 export class Device extends FullAuditedEntity {
@@ -40,4 +47,10 @@ export class Device extends FullAuditedEntity {
     onDelete: 'SET NULL',
   })
   area: Area;
+
+  @Column({ default: false })
+  faceRecognitionEnabled: boolean;
+
+  @OneToMany(() => RecognizedFace, (face) => face.device)
+  recognizedFaces: RecognizedFace[];
 }

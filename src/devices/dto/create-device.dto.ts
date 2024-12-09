@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import {
+  IsBoolean,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class CreateDeviceDto {
   @ApiProperty()
@@ -50,4 +56,9 @@ export class CreateDeviceDto {
   @IsOptional()
   @IsString()
   mac: string;
+
+  @ApiProperty({ required: false, default: false })
+  @IsOptional()
+  @IsBoolean()
+  faceRecognitionEnabled: boolean;
 }

@@ -40,4 +40,7 @@ export class Device extends FullAuditedEntity {
     onDelete: 'SET NULL',
   })
   area: Area;
+
+  @Column({ default: false })
+  faceRecognitionEnabled: boolean;
 }

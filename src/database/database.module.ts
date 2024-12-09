@@ -8,6 +8,7 @@ import { Device } from 'src/entities/device.entity';
 import { EstateMember } from 'src/entities/estate-member.entity';
 import { Estate } from 'src/entities/estate.entity';
 import { FcmToken } from 'src/entities/fcm-token.entity';
+import { RecognizedFace } from 'src/entities/recognized-face.entity';
 import { User } from 'src/entities/user.entity';
 import { DataSource } from 'typeorm';
 
@@ -25,7 +26,15 @@ import { DataSource } from 'typeorm';
           configService.getOrThrow<TDatabaseConfig>('database').dbPassword,
         database: configService.getOrThrow<TDatabaseConfig>('database').dbName,
         ssl: configService.getOrThrow<TDatabaseConfig>('database').dbSSl,
-        entities: [User, FcmToken, Estate, EstateMember, Area, Device],
+        entities: [
+          User,
+          FcmToken,
+          Estate,
+          EstateMember,
+          Area,
+          Device,
+          RecognizedFace,
+        ],
       }),
       dataSourceFactory: async (options) => {
         return await new DataSource(options).initialize();

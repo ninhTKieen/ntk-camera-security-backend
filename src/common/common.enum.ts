@@ -46,3 +46,8 @@ export enum EEstateMemberStatus {
   PENDING = 'PENDING',
   BLOCKED = 'BLOCKED',
 }
+
+export enum EDeviceAlert {
+  STRANGER = 'STRANGER',
+  USER_FOUND = 'USER_FOUND',
+}

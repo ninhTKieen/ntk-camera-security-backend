@@ -9,14 +9,24 @@ import {
   Post,
   Query,
   Request,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
-import { ApiOperation, ApiSecurity, ApiTags } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
+import {
+  ApiBody,
+  ApiConsumes,
+  ApiOperation,
+  ApiSecurity,
+  ApiTags,
+} from '@nestjs/swagger';
 import {
   ApiOkResponseCommon,
   ApiOkResponsePaginated,
 } from 'src/common/common-swagger-response.dto';
 import { GetPaginatedDto } from 'src/common/get-paginated.dto';
+import { CreateRecognizedFaceDto } from 'src/recognized-faces/dto/create-recognized-face.dto';
 
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { AddMemberDto } from './dto/add-member.dto';
@@ -188,5 +198,48 @@ export class EstateController {
   ) {
     const userInfo = req.user;
     return this.estateService.deleteArea(id, areaId, userInfo.id);
+  }
+
+  @UseGuards(AuthGuard)
+  @UseInterceptors(FileInterceptor('image'))
+  @ApiOperation({ summary: 'Upload known face' })
+  @Post(':id/upload-known-face')
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        image: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+      required: ['image'],
+    },
+  })
+  @ApiOkResponseCommon(Boolean)
+  uploadKnownFace(
+    @UploadedFile() file: Express.Multer.File,
+    @Param('id', ParseIntPipe) id: number,
+    @Request() req,
+  ) {
+    return this.estateService.uploadKnownFace(file, id, req.user);
+  }
+
+  @UseGuards(AuthGuard)
+  @Post(':id/add-recognized-face')
+  @ApiOperation({ summary: 'Add recognized face to estate' })
+  @ApiOkResponseCommon(Boolean)
+  addRecognizedFace(
+    @Body() createRecognizedFaceDto: CreateRecognizedFaceDto,
+    @Param('id', ParseIntPipe) id: number,
+    @Request() req,
+  ) {
+    const userInfo = req.user;
+    return this.estateService.addRecognizedFace(
+      createRecognizedFaceDto,
+      id,
+      userInfo,
+    );
   }
 }

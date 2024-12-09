@@ -1,6 +1,6 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
-import { Device } from './device.entity';
+import { Estate } from './estate.entity';
 import { FullAuditedEntity } from './full-audited.entity';
 
 @Entity('recognized_faces')
@@ -23,8 +23,8 @@ export class RecognizedFace extends FullAuditedEntity {
   @Column({ default: true })
   isActive: boolean;
 
-  @ManyToOne(() => Device, (device) => device.recognizedFaces, {
+  @ManyToOne(() => Estate, (estate) => estate.recognizedFaces, {
     nullable: false,
   })
-  device: Device;
+  estate: Estate;
 }

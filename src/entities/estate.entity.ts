@@ -5,6 +5,7 @@ import { Area } from './area.entity';
 import { Device } from './device.entity';
 import { EstateMember } from './estate-member.entity';
 import { FullAuditedEntity } from './full-audited.entity';
+import { RecognizedFace } from './recognized-face.entity';
 
 @Entity('estates')
 export class Estate extends FullAuditedEntity {
@@ -43,4 +44,7 @@ export class Estate extends FullAuditedEntity {
 
   @OneToMany(() => Device, (device) => device.estate)
   devices: Device[];
+
+  @OneToMany(() => RecognizedFace, (face) => face.estate)
+  recognizedFaces: RecognizedFace[];
 }

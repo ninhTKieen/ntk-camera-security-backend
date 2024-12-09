@@ -6,8 +6,12 @@ import { GetPaginatedDto } from 'src/common/get-paginated.dto';
 import { Area } from 'src/entities/area.entity';
 import { EstateMember } from 'src/entities/estate-member.entity';
 import { Estate } from 'src/entities/estate.entity';
+import { RecognizedFace } from 'src/entities/recognized-face.entity';
+import { User } from 'src/entities/user.entity';
+import { CreateRecognizedFaceDto } from 'src/recognized-faces/dto/create-recognized-face.dto';
 import { Repository } from 'typeorm';
 
+import { ImageService } from '../image/image.service';
 import { UsersService } from '../users/users.service';
 import { AddMemberDto } from './dto/add-member.dto';
 import { CreateAreaDto } from './dto/create-area.dto';
@@ -26,10 +30,14 @@ export class EstateService {
     @InjectRepository(EstateMember)
     private readonly estateMemberRepository: Repository<EstateMember>,
 
+    @InjectRepository(RecognizedFace)
+    private readonly recognizedFaceRepository: Repository<RecognizedFace>,
+
     @InjectRepository(Area)
     private readonly areaRepository: Repository<Area>,
 
     private readonly userService: UsersService,
+    private readonly imageService: ImageService,
   ) {}
 
   async findAll(userId: number, options: GetPaginatedDto) {
@@ -636,5 +644,73 @@ export class EstateService {
     await this.areaRepository.delete(areaId);
 
     return { message: 'Area deleted successfully' };
+  }
+
+  async uploadKnownFace(
+    file: Express.Multer.File,
+    estateId: number,
+    userInfo: User,
+  ) {
+    const user = await this.userService.findOne(userInfo, userInfo.id);
+
+    const estate = await this.findById(estateId, user.id);
+
+    // check user is member of estate device
+    const isMember = estate.members.some(
+      (member) => member.user.id === user.id,
+    );
+
+    if (!isMember) {
+      throw new HttpException(
+        {
+          code: HttpStatus.FORBIDDEN,
+          message: 'You do not have permission to upload known face',
+        },
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    const isOwnerOrAdmin = estate.members.some(
+      (member) =>
+        member.user.id === user.id &&
+        (member.role === EEstateRole.OWNER ||
+          member.role === EEstateRole.ADMIN),
+    );
+
+    if (!isOwnerOrAdmin) {
+      throw new HttpException(
+        {
+          code: HttpStatus.FORBIDDEN,
+          message: 'You do not have permission to upload known face',
+        },
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    try {
+      const currentFolder = process.cwd();
+      const uploadsFolder = `${currentFolder}/../Devices/${estateId}/known_people`;
+
+      this.imageService.saveFileToLocal(file, uploadsFolder);
+      return true;
+    } catch (err) {
+      console.log('err', err);
+      return false;
+    }
+  }
+
+  async addRecognizedFace(
+    createRecognizedFaceDto: CreateRecognizedFaceDto,
+    estateId: number,
+    user: User,
+  ) {
+    const estate = await this.findById(estateId, user.id);
+
+    const recognizedFace = this.recognizedFaceRepository.create({
+      ...createRecognizedFaceDto,
+      estate,
+    });
+
+    await this.recognizedFaceRepository.save(recognizedFace);
   }
 }

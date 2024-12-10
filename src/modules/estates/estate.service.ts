@@ -688,7 +688,7 @@ export class EstateService {
     }
 
     try {
-      const currentFolder = './uploads/estates';
+      const currentFolder = `${process.cwd()}/uploads/estates`;
       const uploadsFolder = `${currentFolder}/${estateId}/known_people`;
 
       this.imageService.saveFileToLocal(file, uploadsFolder);

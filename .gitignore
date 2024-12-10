@@ -41,3 +41,6 @@ lerna-debug.log*
 
 # Firebase
 firebase-admin-sdk.json
+
+# Uploads
+uploads

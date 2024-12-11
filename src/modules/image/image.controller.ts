@@ -1,8 +1,11 @@
 import {
   Controller,
   Delete,
+  Get,
   Param,
+  ParseIntPipe,
   Post,
+  StreamableFile,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -15,6 +18,8 @@ import {
   ApiSecurity,
   ApiTags,
 } from '@nestjs/swagger';
+import { createReadStream } from 'fs';
+import { join } from 'path';
 import { ApiOkResponseCommon } from 'src/common/common-swagger-response.dto';
 
 import { AuthGuard } from '../auth/guards/auth.guard';
@@ -54,5 +59,19 @@ export class ImageController {
   @UseGuards(AuthGuard)
   deleteImage(@Param('publicId') publicId: string) {
     return this.imageService.deleteFile(publicId);
+  }
+
+  @Get('/known-face/:estateId')
+  getFile(@Param('estateId', ParseIntPipe) estateId: number): StreamableFile {
+    try {
+      const currentFolder = `${process.cwd()}/uploads/estates`;
+      const uploadsFolder = `${currentFolder}/${estateId}/known_people`;
+
+      const file = createReadStream(join('', uploadsFolder, 'kien.png'));
+      console.log('file', file);
+      return new StreamableFile(file);
+    } catch (error) {
+      console.log('error', error);
+    }
   }
 }

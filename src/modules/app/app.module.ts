@@ -1,6 +1,7 @@
 import { Logger, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
+import { ServeStaticModule } from '@nestjs/serve-static';
 import appConfig from 'src/configs/app.config';
 import authConfig from 'src/configs/auth.config';
 import databaseConfig from 'src/configs/database.config';
@@ -20,6 +21,10 @@ import { AppController } from './app.controller';
 
 @Module({
   imports: [
+    ServeStaticModule.forRoot({
+      rootPath: `${process.cwd()}/uploads`,
+      serveRoot: '/uploads',
+    }),
     ConfigModule.forRoot({
       isGlobal: true,
       load: [appConfig, authConfig, databaseConfig, firebaseConfig],

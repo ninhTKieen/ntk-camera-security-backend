@@ -78,9 +78,8 @@ export class ImageService {
     path: string,
   ): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      const decodedFilename = Buffer.from(file.originalname, 'latin1')
-        .toString('utf8')
-        .normalize('NFC');
+      const decodedFilename = file.originalname.normalize('NFC');
+
       const filePath = `${path}/${decodedFilename}`;
 
       if (!fs.existsSync(path)) {

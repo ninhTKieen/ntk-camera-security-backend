@@ -48,28 +48,7 @@ export class DeviceGateway {
           } else {
             console.log(`stdout: ${stdout}`);
 
-            /**
-             * ./unknown/1733325666813.png,huyền
-             * ./unknown/1733325666813.png,kien
-             * ./unknown/1733236464441.png,kien
-             */
-
             const outputLines = stdout.trim().split('\n');
-            // outputLines.forEach((line) => {
-            //   const result = line.split(',')?.[1];
-            //   if (result === 'no_persons_found') {
-            //     this.server.emit('device/alert', {
-            //       type: EDeviceAlert.STRANGER,
-            //       message: 'Warning of strangers',
-            //     });
-            //   } else {
-            //     this.server.emit('device/alert', {
-            //       type: EDeviceAlert.USER_FOUND,
-            //       name: result,
-            //       message: `Hello, ${result}`,
-            //     });
-            //   }
-            // });
             const alerts = [];
 
             outputLines.forEach((line) => {

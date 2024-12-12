@@ -21,7 +21,7 @@ export class CreateRecognizedFaceDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  faceEncoding: string;
+  idCode: string;
 
   @ApiProperty({ required: false })
   @IsOptional()

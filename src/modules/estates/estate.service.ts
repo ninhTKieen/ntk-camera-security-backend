@@ -649,6 +649,7 @@ export class EstateService {
   async uploadKnownFace(
     file: Express.Multer.File,
     estateId: number,
+    idCode: string,
     userInfo: User,
   ) {
     const user = await this.userService.findOne(userInfo, userInfo.id);
@@ -691,11 +692,20 @@ export class EstateService {
       const currentFolder = `${process.cwd()}/uploads/estates`;
       const uploadsFolder = `${currentFolder}/${estateId}/known_people`;
 
-      this.imageService.saveFileToLocal(file, uploadsFolder);
-      return true;
+      const fileExtension = file.originalname.split('.')[1];
+      file.originalname = `${idCode}.${fileExtension}`;
+
+      const response = this.imageService.saveFileToLocal(file, uploadsFolder);
+      return response;
     } catch (err) {
       console.log('err', err);
-      return false;
+      throw new HttpException(
+        {
+          code: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: 'Failed to upload known face',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -705,6 +715,16 @@ export class EstateService {
     user: User,
   ) {
     const estate = await this.findById(estateId, user.id);
+
+    if (!estate) {
+      throw new HttpException(
+        {
+          code: HttpStatus.NOT_FOUND,
+          message: 'Estate not found',
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
 
     const recognizedFace = this.recognizedFaceRepository.create({
       ...createRecognizedFaceDto,

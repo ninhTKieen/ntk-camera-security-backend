@@ -15,11 +15,6 @@ export class UpdateRecognizedFaceDto {
   @ApiProperty({ required: false })
   @IsOptional()
   @IsString()
-  faceEncoding?: string;
-
-  @ApiProperty({ required: false })
-  @IsOptional()
-  @IsString()
   imageUrl?: string;
 
   @ApiProperty({ required: false })

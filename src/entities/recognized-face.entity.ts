@@ -15,7 +15,7 @@ export class RecognizedFace extends FullAuditedEntity {
   description: string;
 
   @Column({ type: 'text' })
-  faceEncoding: string; // Store face encoding data
+  idCode: string; // Store face identifier code
 
   @Column({ type: 'varchar', length: 255, nullable: true })
   imageUrl: string; // Store reference to face image

@@ -213,17 +213,21 @@ export class EstateController {
           type: 'string',
           format: 'binary',
         },
+        idCode: {
+          type: 'string',
+        },
       },
-      required: ['image'],
+      required: ['image', 'idCode'],
     },
   })
   @ApiOkResponseCommon(Boolean)
   uploadKnownFace(
     @UploadedFile() file: Express.Multer.File,
     @Param('id', ParseIntPipe) id: number,
+    @Body('idCode') idCode: string,
     @Request() req,
   ) {
-    return this.estateService.uploadKnownFace(file, id, req.user);
+    return this.estateService.uploadKnownFace(file, id, idCode, req.user);
   }
 
   @UseGuards(AuthGuard)

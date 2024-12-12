@@ -11,7 +11,7 @@ export class GetRecognizedFaceDto {
   description?: string;
 
   @ApiProperty()
-  faceEncoding: string;
+  idCode: string;
 
   @ApiProperty({ required: false })
   imageUrl?: string;

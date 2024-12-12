@@ -76,7 +76,10 @@ export class ImageService {
   async saveFileToLocal(
     file: Express.Multer.File,
     path: string,
-  ): Promise<boolean> {
+  ): Promise<{
+    message: string;
+    filePath: string;
+  }> {
     return new Promise((resolve, reject) => {
       const decodedFilename = file.originalname.normalize('NFC');
 
@@ -91,7 +94,10 @@ export class ImageService {
           reject(err);
           return false;
         }
-        resolve(true);
+        resolve({
+          message: 'File saved successfully',
+          filePath: filePath.replace(process.cwd(), ''),
+        });
       });
     });
   }

@@ -1,5 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { EEstateType } from 'src/common/common.enum';
+import { IsOptional, IsString } from 'class-validator';
+import { EEstateMemberStatus, EEstateType } from 'src/common/common.enum';
+import { GetPaginatedDto } from 'src/common/get-paginated.dto';
 import { EstateMember } from 'src/entities/estate-member.entity';
 
 export class GetAllEstateDto {
@@ -32,4 +34,16 @@ export class GetAllEstateDto {
 
   @ApiProperty({ example: [] })
   members: EstateMember[];
+}
+
+export class GetAllEstateParams extends GetPaginatedDto {
+  @IsString()
+  @IsOptional()
+  @ApiProperty({
+    type: String,
+    default: '',
+    required: false,
+    enum: EEstateMemberStatus,
+  })
+  status?: EEstateMemberStatus;
 }

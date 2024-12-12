@@ -2,7 +2,6 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { paginate } from 'nestjs-typeorm-paginate';
 import { EEstateMemberStatus, EEstateRole } from 'src/common/common.enum';
-import { GetPaginatedDto } from 'src/common/get-paginated.dto';
 import { Area } from 'src/entities/area.entity';
 import { EstateMember } from 'src/entities/estate-member.entity';
 import { Estate } from 'src/entities/estate.entity';
@@ -16,7 +15,7 @@ import { UsersService } from '../users/users.service';
 import { AddMemberDto } from './dto/add-member.dto';
 import { CreateAreaDto } from './dto/create-area.dto';
 import { CreateEstateDto } from './dto/create-estate.dto';
-import { GetAllEstateDto } from './dto/get-all-estate.dto';
+import { GetAllEstateDto, GetAllEstateParams } from './dto/get-all-estate.dto';
 import { UpdateAreaDto } from './dto/update-area.dto';
 import { UpdateEstateDto } from './dto/update-estate.dto';
 import { UpdateMemberDto } from './dto/update-member.dto';
@@ -40,7 +39,7 @@ export class EstateService {
     private readonly imageService: ImageService,
   ) {}
 
-  async findAll(userId: number, options: GetPaginatedDto) {
+  async findAll(userId: number, options: GetAllEstateParams) {
     const user = await this.userService.findById(userId);
 
     if (!user) {
@@ -66,6 +65,10 @@ export class EstateService {
       qb.andWhere('estate.name ILIKE :search', {
         search: `%${options.search}%`,
       });
+    }
+
+    if (options.status) {
+      qb.andWhere('member.status = :status', { status: options.status });
     }
 
     const paginatedResults = await paginate<GetAllEstateDto>(qb, options);

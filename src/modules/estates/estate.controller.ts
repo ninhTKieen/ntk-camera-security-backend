@@ -25,14 +25,13 @@ import {
   ApiOkResponseCommon,
   ApiOkResponsePaginated,
 } from 'src/common/common-swagger-response.dto';
-import { GetPaginatedDto } from 'src/common/get-paginated.dto';
 import { CreateRecognizedFaceDto } from 'src/recognized-faces/dto/create-recognized-face.dto';
 
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { AddMemberDto } from './dto/add-member.dto';
 import { CreateAreaDto } from './dto/create-area.dto';
 import { CreateEstateDto } from './dto/create-estate.dto';
-import { GetAllEstateDto } from './dto/get-all-estate.dto';
+import { GetAllEstateDto, GetAllEstateParams } from './dto/get-all-estate.dto';
 import { GetDetailEstateDto } from './dto/get-detail-estate.dto';
 import { UpdateAreaDto } from './dto/update-area.dto';
 import { UpdateMemberDto } from './dto/update-member.dto';
@@ -48,7 +47,7 @@ export class EstateController {
   @ApiOperation({ summary: 'Get all estates' })
   @Get('/get-all')
   @ApiOkResponsePaginated(GetAllEstateDto)
-  findAll(@Request() req, @Query() options: GetPaginatedDto) {
+  findAll(@Request() req, @Query() options: GetAllEstateParams) {
     return this.estateService.findAll(req.user.id, options);
   }
 

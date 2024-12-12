@@ -18,6 +18,7 @@ import {
   ApiBody,
   ApiConsumes,
   ApiOperation,
+  ApiParam,
   ApiSecurity,
   ApiTags,
 } from '@nestjs/swagger';
@@ -26,6 +27,8 @@ import {
   ApiOkResponsePaginated,
 } from 'src/common/common-swagger-response.dto';
 import { CreateRecognizedFaceDto } from 'src/recognized-faces/dto/create-recognized-face.dto';
+import { GetRecognizedFaceDto } from 'src/recognized-faces/dto/get-recognized-faces.dto';
+import { UpdateRecognizedFaceDto } from 'src/recognized-faces/dto/update-recognized-face.dto';
 
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { AddMemberDto } from './dto/add-member.dto';
@@ -230,6 +233,16 @@ export class EstateController {
   }
 
   @UseGuards(AuthGuard)
+  @Get(':id/recognized-faces')
+  @ApiOperation({ summary: 'Get recognized faces of an estate' })
+  @ApiParam({ name: 'id', type: Number, description: 'Estate ID' })
+  @ApiOkResponseCommon(GetRecognizedFaceDto)
+  getRecognizedFaces(@Param('id', ParseIntPipe) id: number, @Request() req) {
+    const userInfo = req.user;
+    return this.estateService.getRecognizedFaces(id, userInfo.id);
+  }
+
+  @UseGuards(AuthGuard)
   @Post(':id/add-recognized-face')
   @ApiOperation({ summary: 'Add recognized face to estate' })
   @ApiOkResponseCommon(Boolean)
@@ -243,6 +256,46 @@ export class EstateController {
       createRecognizedFaceDto,
       id,
       userInfo,
+    );
+  }
+
+  @UseGuards(AuthGuard)
+  @Patch(':id/recognized-faces/:recognizedFaceId')
+  @ApiOperation({ summary: 'Update recognized face details' })
+  @ApiParam({ name: 'id', type: Number, description: 'Estate ID' })
+  @ApiParam({
+    name: 'recognizedFaceId',
+    type: Number,
+    description: 'Recognized Face ID',
+  })
+  @ApiOkResponseCommon(Boolean)
+  updateRecognizedFace(
+    @Param('id', ParseIntPipe) id: number,
+    @Param('recognizedFaceId', ParseIntPipe) recognizedFaceId: number,
+    @Body() updateRecognizedFaceDto: UpdateRecognizedFaceDto,
+    @Request() req,
+  ) {
+    const userInfo = req.user;
+    return this.estateService.updateRecognizedFace(
+      recognizedFaceId,
+      updateRecognizedFaceDto,
+      userInfo.id,
+    );
+  }
+
+  @UseGuards(AuthGuard)
+  @Delete(':id/recognized-faces/:recognizedFaceId')
+  @ApiOperation({ summary: 'Delete recognized face' })
+  @ApiOkResponseCommon(Boolean)
+  deleteRecognizedFace(
+    @Param('id', ParseIntPipe) id: number,
+    @Param('recognizedFaceId', ParseIntPipe) recognizedFaceId: number,
+    @Request() req,
+  ) {
+    const userInfo = req.user;
+    return this.estateService.deleteRecognizedFace(
+      recognizedFaceId,
+      userInfo.id,
     );
   }
 }

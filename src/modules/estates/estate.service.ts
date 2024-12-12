@@ -8,6 +8,7 @@ import { Estate } from 'src/entities/estate.entity';
 import { RecognizedFace } from 'src/entities/recognized-face.entity';
 import { User } from 'src/entities/user.entity';
 import { CreateRecognizedFaceDto } from 'src/recognized-faces/dto/create-recognized-face.dto';
+import { UpdateRecognizedFaceDto } from 'src/recognized-faces/dto/update-recognized-face.dto';
 import { Repository } from 'typeorm';
 
 import { ImageService } from '../image/image.service';
@@ -712,6 +713,12 @@ export class EstateService {
     }
   }
 
+  private checkAvailableIdCode(idCode: string, estateId: number) {
+    return this.recognizedFaceRepository.findOne({
+      where: { idCode, estate: { id: estateId } },
+    });
+  }
+
   async addRecognizedFace(
     createRecognizedFaceDto: CreateRecognizedFaceDto,
     estateId: number,
@@ -729,11 +736,121 @@ export class EstateService {
       );
     }
 
+    const isAvailableIdCode = await this.checkAvailableIdCode(
+      createRecognizedFaceDto.idCode,
+      estateId,
+    );
+
+    if (isAvailableIdCode) {
+      throw new HttpException(
+        {
+          code: HttpStatus.BAD_REQUEST,
+          message: 'ID code already exists',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
     const recognizedFace = this.recognizedFaceRepository.create({
       ...createRecognizedFaceDto,
       estate,
     });
 
     await this.recognizedFaceRepository.save(recognizedFace);
+  }
+
+  async getRecognizedFaces(estateId: number, userId: number) {
+    const estate = await this.findById(estateId, userId);
+
+    if (!estate) {
+      throw new HttpException(
+        {
+          code: HttpStatus.NOT_FOUND,
+          message: 'Estate not found',
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    const recognizedFaces = await this.recognizedFaceRepository.find({
+      where: {
+        estate: { id: estate.id },
+      },
+    });
+
+    return recognizedFaces;
+  }
+
+  async updateRecognizedFace(
+    recognizedFaceId: number,
+    createRecognizedFaceDto: UpdateRecognizedFaceDto,
+    userId: number,
+  ) {
+    const recognizedFace = await this.recognizedFaceRepository.findOne({
+      where: { id: recognizedFaceId },
+    });
+
+    if (!recognizedFace) {
+      throw new HttpException(
+        {
+          code: HttpStatus.NOT_FOUND,
+          message: 'Recognized face not found',
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    const isOwner = recognizedFace.estate.members.some(
+      (member) =>
+        member.user.id === userId && member.role === EEstateRole.OWNER,
+    );
+
+    if (!isOwner) {
+      throw new HttpException(
+        {
+          code: HttpStatus.FORBIDDEN,
+          message: 'You do not have permission to update recognized faces',
+        },
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    await this.recognizedFaceRepository.update(
+      recognizedFaceId,
+      createRecognizedFaceDto,
+    );
+  }
+
+  async deleteRecognizedFace(recognizedFaceId: number, userId: number) {
+    const recognizedFace = await this.recognizedFaceRepository.findOne({
+      where: { id: recognizedFaceId },
+    });
+
+    if (!recognizedFace) {
+      throw new HttpException(
+        {
+          code: HttpStatus.NOT_FOUND,
+          message: 'Recognized face not found',
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    const isOwner = recognizedFace.estate.members.some(
+      (member) =>
+        member.user.id === userId && member.role === EEstateRole.OWNER,
+    );
+
+    if (!isOwner) {
+      throw new HttpException(
+        {
+          code: HttpStatus.FORBIDDEN,
+          message: 'You do not have permission to delete recognized faces',
+        },
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    await this.recognizedFaceRepository.delete(recognizedFaceId);
   }
 }

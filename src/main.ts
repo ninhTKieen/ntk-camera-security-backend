@@ -1,6 +1,7 @@
 import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
+import * as bodyParser from 'body-parser';
 
 import { TAppConfig } from './configs/app.config';
 import { AppModule } from './modules/app/app.module';
@@ -12,6 +13,8 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
 
   app.enableCors();
+  app.use(bodyParser.json({ limit: '50mb' }));
+  app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
   setupSwagger({
     app,

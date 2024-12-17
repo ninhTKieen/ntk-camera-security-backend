@@ -3,15 +3,48 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { exec } from 'child_process';
-import * as fs from 'fs';
+import * as tf from '@tensorflow/tfjs-node';
+import * as faceApi from '@vladmandic/face-api';
 import { Server, Socket } from 'socket.io';
-import { EDeviceAlert } from 'src/common/common.enum';
 
-@WebSocketGateway()
+@WebSocketGateway({
+  cors: true,
+  maxHttpBufferSize: 1e7,
+})
 export class DeviceGateway {
   @WebSocketServer()
   server: Server;
+
+  private async faceDetection(base64: string) {
+    const modelPath = `${process.cwd()}/uploads/models`;
+
+    const base64Data = base64.replace(/^data:image\/png;base64,/, '');
+    const buffer = Buffer.from(base64Data, 'base64');
+
+    try {
+      await faceApi.nets.ssdMobilenetv1.loadFromDisk(modelPath);
+      await faceApi.nets.faceLandmark68Net.loadFromDisk(modelPath);
+      await faceApi.nets.faceRecognitionNet.loadFromDisk(modelPath);
+      console.log('Model loaded successfully');
+      const tensor = tf.node.decodeImage(buffer, 3);
+      console.log('tensor', tensor);
+      const faces = await faceApi
+        .detectAllFaces(
+          tensor as any,
+          new faceApi.SsdMobilenetv1Options({
+            minConfidence: 0.2,
+            maxResults: 5,
+          }),
+        )
+        .withFaceLandmarks()
+        .withFaceDescriptors();
+
+      return faces;
+    } catch (error) {
+      console.log(error);
+      throw new Error('Face detection failed');
+    }
+  }
 
   handleConnection(client: Socket) {
     console.log(`Client connected: ${client.id}`);
@@ -29,61 +62,13 @@ export class DeviceGateway {
 
   @SubscribeMessage('device/send-base64')
   handleSendBase64(client: Socket, base64: string): void {
-    try {
-      const currentFolder = process.cwd();
-      const uploadsFolder = `${currentFolder}/../Project-DeepL/unknown`;
-      const targetDir = `${currentFolder}/../Project-DeepL`;
-      if (!fs.existsSync(uploadsFolder)) {
-        fs.mkdirSync(uploadsFolder, { recursive: true });
-      }
-      const fileName = `${uploadsFolder}/${Date.now()}.png`;
-      fs.writeFileSync(fileName, base64, 'base64');
-
-      exec(
-        `source ${targetDir}/.venv/bin/activate && face_recognition ./known_people/ ./unknown`,
-        { cwd: targetDir },
-        (error, stdout) => {
-          if (error) {
-            console.error(`exec error: ${error}`);
-          } else {
-            console.log(`stdout: ${stdout}`);
-
-            const outputLines = stdout.trim().split('\n');
-            const alerts = [];
-
-            outputLines.forEach((line) => {
-              const result = line.split(',')?.[1];
-
-              if (result === 'no_persons_found') {
-                alerts.push({
-                  type: EDeviceAlert.STRANGER,
-                  message: 'Warning of strangers',
-                });
-              } else {
-                alerts.push({
-                  type: EDeviceAlert.USER_FOUND,
-                  name: result,
-                  message: `Hello, ${result}`,
-                });
-              }
-            });
-
-            this.server.emit('device/alert', alerts);
-          }
-
-          // Remove the file after execution completes
-          fs.unlink(fileName, (err) => {
-            if (err) {
-              console.error(`Failed to delete file: ${fileName}`, err);
-            } else {
-              console.log(`File deleted: ${fileName}`);
-            }
-          });
-        },
-      );
-    } catch (error) {
-      console.error('err', error);
-    }
-    // this.server.emit('device/receive-base64', base64);
+    this.faceDetection(base64)
+      .then((faces) => {
+        console.log('send faces to client');
+        this.server.emit('device/receive-faces', faces);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   }
 }

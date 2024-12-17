@@ -43,6 +43,8 @@
     "@nestjs/swagger": "^7.1.16",
     "@nestjs/typeorm": "^10.0.1",
     "@nestjs/websockets": "^10.4.11",
+    "@tensorflow/tfjs-node": "^4.22.0",
+    "@vladmandic/face-api": "^1.7.14",
     "bcrypt": "^5.1.1",
     "buffer": "^6.0.3",
     "class-transformer": "^0.5.1",

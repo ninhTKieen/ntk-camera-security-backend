@@ -781,6 +781,39 @@ export class EstateService {
     return recognizedFaces;
   }
 
+  async getRecognizedFace(estateId: number, recognizedFaceId: number, userId) {
+    const estate = await this.findById(estateId, userId);
+
+    if (!estate) {
+      throw new HttpException(
+        {
+          code: HttpStatus.NOT_FOUND,
+          message: 'Estate not found',
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    const recognizedFace = await this.recognizedFaceRepository.findOne({
+      where: {
+        id: recognizedFaceId,
+        estate: { id: estate.id },
+      },
+    });
+
+    if (!recognizedFace) {
+      throw new HttpException(
+        {
+          code: HttpStatus.NOT_FOUND,
+          message: 'Recognized face not found',
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    return recognizedFace;
+  }
+
   async updateRecognizedFace(
     recognizedFaceId: number,
     createRecognizedFaceDto: UpdateRecognizedFaceDto,

@@ -243,6 +243,29 @@ export class EstateController {
   }
 
   @UseGuards(AuthGuard)
+  @Get(':id/recognized-faces/:recognizedFaceId')
+  @ApiOperation({ summary: 'Get recognized face detail' })
+  @ApiParam({ name: 'id', type: Number, description: 'Estate ID' })
+  @ApiParam({
+    name: 'recognizedFaceId',
+    type: Number,
+    description: 'Recognized Face ID',
+  })
+  @ApiOkResponseCommon(GetRecognizedFaceDto)
+  getRecognizedFace(
+    @Param('id', ParseIntPipe) id: number,
+    @Param('recognizedFaceId', ParseIntPipe) recognizedFaceId: number,
+    @Request() req,
+  ) {
+    const userInfo = req.user;
+    return this.estateService.getRecognizedFace(
+      id,
+      recognizedFaceId,
+      userInfo.id,
+    );
+  }
+
+  @UseGuards(AuthGuard)
   @Post(':id/add-recognized-face')
   @ApiOperation({ summary: 'Add recognized face to estate' })
   @ApiOkResponseCommon(Boolean)

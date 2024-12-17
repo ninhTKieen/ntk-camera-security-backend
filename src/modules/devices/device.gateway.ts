@@ -25,9 +25,7 @@ export class DeviceGateway {
       await faceApi.nets.ssdMobilenetv1.loadFromDisk(modelPath);
       await faceApi.nets.faceLandmark68Net.loadFromDisk(modelPath);
       await faceApi.nets.faceRecognitionNet.loadFromDisk(modelPath);
-      console.log('Model loaded successfully');
       const tensor = tf.node.decodeImage(buffer, 3);
-      console.log('tensor', tensor);
       const faces = await faceApi
         .detectAllFaces(
           tensor as any,

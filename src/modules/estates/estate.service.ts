@@ -660,7 +660,6 @@ export class EstateService {
 
     const estate = await this.findById(estateId, user.id);
 
-    // check user is member of estate device
     const isMember = estate.members.some(
       (member) => member.user.id === user.id,
     );
@@ -857,7 +856,11 @@ export class EstateService {
     );
   }
 
-  async deleteRecognizedFace(recognizedFaceId: number, userId: number) {
+  async deleteRecognizedFace(
+    estateId: number,
+    recognizedFaceId: number,
+    userId: number,
+  ) {
     const recognizedFace = await this.recognizedFaceRepository.findOne({
       where: { id: recognizedFaceId },
     });
@@ -872,7 +875,9 @@ export class EstateService {
       );
     }
 
-    const isOwner = recognizedFace.estate.members.some(
+    const estate = await this.findById(estateId, userId);
+
+    const isOwner = estate.members.some(
       (member) =>
         member.user.id === userId && member.role === EEstateRole.OWNER,
     );

@@ -318,6 +318,7 @@ export class EstateController {
   ) {
     const userInfo = req.user;
     return this.estateService.deleteRecognizedFace(
+      id,
       recognizedFaceId,
       userInfo.id,
     );

@@ -889,4 +889,10 @@ export class EstateService {
 
     await this.recognizedFaceRepository.delete(recognizedFaceId);
   }
+
+  async findRecognizedFaceByCode(idCode: string, estateId: number) {
+    return this.recognizedFaceRepository.findOne({
+      where: { idCode, estate: { id: estateId } },
+    });
+  }
 }

@@ -300,6 +300,7 @@ export class EstateController {
   ) {
     const userInfo = req.user;
     return this.estateService.updateRecognizedFace(
+      id,
       recognizedFaceId,
       updateRecognizedFaceDto,
       userInfo.id,

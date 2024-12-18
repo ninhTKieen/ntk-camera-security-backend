@@ -815,6 +815,7 @@ export class EstateService {
   }
 
   async updateRecognizedFace(
+    estateId: number,
     recognizedFaceId: number,
     createRecognizedFaceDto: UpdateRecognizedFaceDto,
     userId: number,
@@ -833,7 +834,9 @@ export class EstateService {
       );
     }
 
-    const isOwner = recognizedFace.estate.members.some(
+    const estate = await this.findById(estateId, userId);
+
+    const isOwner = estate.members.some(
       (member) =>
         member.user.id === userId && member.role === EEstateRole.OWNER,
     );

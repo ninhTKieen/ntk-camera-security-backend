@@ -178,7 +178,7 @@ export class DeviceGateway {
     const { base64, estateId } = payload;
     this.faceDetection(base64)
       .then((faces) => {
-        this.server.emit('device/receive-faces', faces);
+        // this.server.emit('device/receive-faces', faces);
         this.faceRecognition(faces, estateId)
           .then((result) => {
             this.server.emit('device/receive-recognized-faces', result);

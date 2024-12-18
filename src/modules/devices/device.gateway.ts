@@ -29,6 +29,10 @@ export class DeviceGateway {
   server: Server;
 
   private static modelsLoaded = false;
+  private knownPeopleCached: Map<
+    number,
+    { personName: string; descriptor: TFace }[]
+  > = new Map();
 
   constructor(
     @Inject(forwardRef(() => EstateService))
@@ -125,7 +129,7 @@ export class DeviceGateway {
   }
 
   private async faceRecognition(faces: TFace[], estateId: number) {
-    const knownPeople = await this.loadKnownPeople(estateId);
+    const knownPeople = this.knownPeopleCached.get(estateId);
 
     const result = faces.map((face) => {
       const bestMatch = knownPeople.reduce(
@@ -161,10 +165,52 @@ export class DeviceGateway {
     console.log(`Client disconnected: ${client.id}`);
   }
 
-  @SubscribeMessage('message/send')
-  handleMessage(client: Socket, payload: any): void {
-    console.log(payload);
-    this.server.emit('message/receive', payload);
+  @SubscribeMessage('device/join-room')
+  async handleWsJoinRoom(
+    client: Socket,
+    payload: { estateId: number; deviceId: number },
+  ) {
+    const { estateId, deviceId } = payload;
+    try {
+      // Check if known people are already cached
+      if (!this.knownPeopleCached.has(estateId)) {
+        const knownPeople = await this.loadKnownPeople(estateId);
+        this.knownPeopleCached.set(estateId, knownPeople);
+      }
+
+      client.join(`estate-${estateId}-device-${deviceId}-${client.id}`);
+      console.log(
+        `Client ${client.id} joined room estate-${estateId}-device-${deviceId}`,
+      );
+
+      client.emit('device/joined-room', {
+        estateId,
+        deviceId,
+      });
+
+      // Emit the list of known people to the client
+      client.emit('device/known-people', this.knownPeopleCached.get(estateId));
+    } catch (error) {
+      console.error(
+        `Failed to load known people for estate ${estateId}:`,
+        error,
+      );
+
+      client.emit('device/error', {
+        message: 'Failed to load known people',
+        error: error.message,
+      });
+    }
+  }
+
+  @SubscribeMessage('device/leave-room')
+  handleWsLeaveRoom(client: Socket, payload: { estateId: number }) {
+    client.leave(`estate-${payload.estateId}`);
+    console.log(`Client ${client.id} left room estate-${payload.estateId}`);
+
+    client.emit('device/left-room', {
+      estateId: payload.estateId,
+    });
   }
 
   @SubscribeMessage('device/send-base64')
@@ -173,15 +219,30 @@ export class DeviceGateway {
     payload: {
       base64: string;
       estateId: number;
+      deviceId: number;
     },
   ): void {
-    const { base64, estateId } = payload;
+    const { base64, estateId, deviceId } = payload;
+    const knownPeople = this.knownPeopleCached.get(estateId);
+
+    if (!knownPeople) {
+      console.log('Known people not loaded for this estate.');
+      client.emit('device/error', {
+        message: 'Known people not loaded for this estate.',
+      });
+      return;
+    }
+
     this.faceDetection(base64)
       .then((faces) => {
-        this.server.emit('device/receive-faces', faces);
+        // this.server.emit('device/receive-faces', faces);
         this.faceRecognition(faces, estateId)
           .then((result) => {
-            this.server.emit('device/receive-recognized-faces', result);
+            const room = `estate-${estateId}-device-${deviceId}-${client.id}`;
+            this.server
+              .to(room)
+              .emit('device/receive-recognized-faces', result);
+            // client.emit('device/receive-recognized-faces', result);
           })
           .catch((error) => {
             console.log('Face recognition failed:', error);

@@ -204,9 +204,16 @@ export class DeviceGateway {
   }
 
   @SubscribeMessage('device/leave-room')
-  handleWsLeaveRoom(client: Socket, payload: { estateId: number }) {
-    client.leave(`estate-${payload.estateId}`);
-    console.log(`Client ${client.id} left room estate-${payload.estateId}`);
+  handleWsLeaveRoom(
+    client: Socket,
+    payload: { estateId: number; deviceId: number },
+  ) {
+    client.leave(
+      `estate-${payload.estateId}-device-${payload.deviceId}-${client.id}`,
+    );
+    console.log(
+      `Client ${client.id} left room estate-${payload.estateId}-device-${payload.deviceId}`,
+    );
 
     client.emit('device/left-room', {
       estateId: payload.estateId,

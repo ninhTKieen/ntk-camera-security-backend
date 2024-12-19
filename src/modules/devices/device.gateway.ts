@@ -173,10 +173,8 @@ export class DeviceGateway {
     const { estateId, deviceId } = payload;
     try {
       // Check if known people are already cached
-      if (!this.knownPeopleCached.has(estateId)) {
-        const knownPeople = await this.loadKnownPeople(estateId);
-        this.knownPeopleCached.set(estateId, knownPeople);
-      }
+      const knownPeople = await this.loadKnownPeople(estateId);
+      this.knownPeopleCached.set(estateId, knownPeople);
 
       client.join(`estate-${estateId}-device-${deviceId}-${client.id}`);
       console.log(

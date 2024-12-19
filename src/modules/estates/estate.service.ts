@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import * as fs from 'fs';
 import { paginate } from 'nestjs-typeorm-paginate';
 import { EEstateMemberStatus, EEstateRole } from 'src/common/common.enum';
 import { Area } from 'src/entities/area.entity';
@@ -112,6 +113,13 @@ export class EstateService {
     });
 
     await this.estateMemberRepository.save(estateMember);
+
+    const currentFolder = `${process.cwd()}/uploads/estates`;
+    const uploadsFolder = `${currentFolder}/${savedEstate.id}/known_people`;
+
+    if (!fs.existsSync(uploadsFolder)) {
+      fs.mkdirSync(uploadsFolder, { recursive: true });
+    }
 
     return savedEstate;
   }

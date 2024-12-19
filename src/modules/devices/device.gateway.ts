@@ -172,7 +172,6 @@ export class DeviceGateway {
   ) {
     const { estateId, deviceId } = payload;
     try {
-      // Check if known people are already cached
       const knownPeople = await this.loadKnownPeople(estateId);
       this.knownPeopleCached.set(estateId, knownPeople);
 

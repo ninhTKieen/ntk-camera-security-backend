@@ -137,4 +137,36 @@ export class AuthService {
       },
     );
   }
+
+  async adminLogin(loginDto: LoginDto): Promise<LoginResponseDto> {
+    const user = await this.usersService.findWithEmail(loginDto.email, true);
+
+    if (!user || !bcrypt.compareSync(loginDto.password, user.password)) {
+      throw new HttpException(
+        {
+          code: HttpStatus.UNAUTHORIZED,
+          message: ErrorMessages.INVALID_CREDENTIALS,
+        },
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    if (user.role !== ERole.ADMIN) {
+      throw new HttpException(
+        {
+          code: HttpStatus.UNAUTHORIZED,
+          message: ErrorMessages.INVALID_CREDENTIALS,
+        },
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    delete user.password;
+
+    return {
+      accessToken: await this.generateToken(user, loginDto.isRemember),
+      refreshToken: await this.generateToken(user, true),
+      user,
+    };
+  }
 }

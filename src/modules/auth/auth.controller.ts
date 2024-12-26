@@ -19,6 +19,13 @@ export class AuthController {
     return this.authService.login(loginDto);
   }
 
+  @Post('/admin-login')
+  @ApiOperation({ summary: 'Admin login' })
+  @ApiOkResponseCommon(LoginResponseDto, 'Login success')
+  async adminLogin(@Body(new ValidationPipe()) loginDto: LoginDto) {
+    return this.authService.adminLogin(loginDto);
+  }
+
   @Post('/register')
   @ApiOperation({ summary: 'Register' })
   @ApiOkResponseCommon(RegisterResponseDto, 'Register success')

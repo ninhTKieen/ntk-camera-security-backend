@@ -11,6 +11,7 @@ import { User } from 'src/entities/user.entity';
 import { Repository } from 'typeorm';
 
 import { ImageService } from '../image/image.service';
+import { AdminUpdateUserDto } from './dto/admin-update-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { GetAllUserDto } from './dto/get-all-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -152,7 +153,6 @@ export class UsersService {
     return this.userRepository.save(createUser);
   }
 
-  // Only for user, not for admin
   async update(userInfo: User, id: number, updateUser: UpdateUserDto) {
     const user = await this.findById(id);
 
@@ -194,5 +194,55 @@ export class UsersService {
     }
 
     return !!result;
+  }
+
+  async removeMultiple(userInfo: User, ids: number[]) {
+    if (userInfo.role !== ERole.ADMIN) {
+      throw new HttpException(
+        {
+          code: HttpStatus.FORBIDDEN,
+          message: 'You are not allowed to access this resource',
+        },
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    const result = await this.userRepository.softDelete(ids);
+
+    return !!result;
+  }
+
+  async adminUpdate(
+    id: number,
+    updateUser: AdminUpdateUserDto,
+    userInfo: User,
+  ) {
+    if (userInfo.role !== ERole.ADMIN) {
+      throw new HttpException(
+        {
+          code: HttpStatus.FORBIDDEN,
+          message: 'You are not allowed to access this resource',
+        },
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    const user = await this.findById(id);
+
+    if (
+      updateUser.imageUrl &&
+      updateUser.imageUrlId !== user.imageUrlId &&
+      user.imageUrlId
+    ) {
+      await this.imageService.deleteFile(user.imageUrlId);
+    }
+
+    const result = await this.userRepository.update(id, updateUser);
+
+    return !!result;
+  }
+
+  async adminCreate(createUser: CreateUserDto) {
+    return this.userRepository.save(createUser);
   }
 }

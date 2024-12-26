@@ -8,6 +8,8 @@ import { RecognizedFace } from 'src/entities/recognized-face.entity';
 
 import { ImageModule } from '../image/image.module';
 import { UsersModule } from '../users/users.module';
+import { AdminEstateController } from './admin-estate.controller';
+import { AdminEstateService } from './admin-estate.service';
 import { EstateController } from './estate.controller';
 import { EstateService } from './estate.service';
 
@@ -23,8 +25,8 @@ import { EstateService } from './estate.service';
     forwardRef(() => ImageModule),
     forwardRef(() => UsersModule),
   ],
-  controllers: [EstateController],
-  providers: [EstateService],
+  controllers: [EstateController, AdminEstateController],
+  providers: [EstateService, AdminEstateService],
   exports: [EstateService],
 })
 export class EstateModule {}

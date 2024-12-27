@@ -61,4 +61,14 @@ export class CreateDeviceDto {
   @IsOptional()
   @IsBoolean()
   faceRecognitionEnabled: boolean;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  imageUrl: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  imageUrlId: string;
 }

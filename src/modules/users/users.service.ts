@@ -193,6 +193,10 @@ export class UsersService {
       );
     }
 
+    if (user.imageUrlId) {
+      await this.imageService.deleteFile(user.imageUrlId);
+    }
+
     return !!result;
   }
 

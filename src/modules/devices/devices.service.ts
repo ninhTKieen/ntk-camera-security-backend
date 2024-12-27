@@ -5,6 +5,7 @@ import { Device } from 'src/entities/device.entity';
 import { EstateService } from 'src/modules/estates/estate.service';
 import { Repository } from 'typeorm';
 
+import { ImageService } from '../image/image.service';
 import { CreateDeviceDto } from './dto/create-device.dto';
 import { GetListDeviceDto } from './dto/get-list-device.dto';
 import { UpdateDeviceDto } from './dto/update-device.dto';
@@ -16,6 +17,8 @@ export class DevicesService {
     private readonly deviceRepository: Repository<Device>,
 
     private readonly estateService: EstateService,
+
+    private readonly imageService: ImageService,
   ) {}
 
   async create(createDeviceDto: CreateDeviceDto, userId: number) {
@@ -144,6 +147,14 @@ export class DevicesService {
       );
     }
 
+    if (
+      updateDeviceDto.imageUrl &&
+      updateDeviceDto.imageUrlId !== device.imageUrlId &&
+      device.imageUrlId
+    ) {
+      await this.imageService.deleteFile(device.imageUrlId);
+    }
+
     this.deviceRepository.update(id, updateDeviceDto);
 
     return true;
@@ -168,6 +179,10 @@ export class DevicesService {
         },
         HttpStatus.FORBIDDEN,
       );
+    }
+
+    if (device.imageUrlId) {
+      await this.imageService.deleteFile(device.imageUrlId);
     }
 
     this.deviceRepository.delete(id);

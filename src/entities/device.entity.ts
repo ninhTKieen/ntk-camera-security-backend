@@ -43,4 +43,10 @@ export class Device extends FullAuditedEntity {
 
   @Column({ default: false })
   faceRecognitionEnabled: boolean;
+
+  @Column({ nullable: true })
+  imageUrl: string;
+
+  @Column({ nullable: true })
+  imageUrlId: string;
 }

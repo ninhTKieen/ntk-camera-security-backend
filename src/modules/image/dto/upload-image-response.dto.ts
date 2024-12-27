@@ -19,3 +19,8 @@ export class UploadImageResponseDto {
   @ApiProperty()
   format: string;
 }
+
+export class UploadImagesResponseDto {
+  @ApiProperty()
+  images: UploadImageResponseDto[];
+}

@@ -26,11 +26,9 @@ import { AdminCreateEstateDto } from './dto/admin-create-estate.dto';
 import { AdminUpdateEstateDto } from './dto/admin-update-estate-dto';
 import { GetAllEstateDto, GetAllEstateParams } from './dto/get-all-estate.dto';
 
-``;
-
 @Controller('api/admin/estates')
 @ApiSecurity('access-token')
-@ApiTags('Admin-Estates')
+@ApiTags('Admin Estates')
 export class AdminEstateController {
   constructor(private readonly adminEstateService: AdminEstateService) {}
 

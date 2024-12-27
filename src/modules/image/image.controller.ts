@@ -7,13 +7,15 @@ import {
   Post,
   StreamableFile,
   UploadedFile,
+  UploadedFiles,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import {
   ApiBody,
   ApiConsumes,
+  ApiOkResponse,
   ApiOperation,
   ApiSecurity,
   ApiTags,
@@ -51,6 +53,34 @@ export class ImageController {
   @ApiOkResponseCommon(UploadImageResponseDto)
   uploadImage(@UploadedFile() file: Express.Multer.File) {
     return this.imageService.uploadFile(file);
+  }
+
+  @Post('/upload-multiple')
+  @UseInterceptors(FilesInterceptor('images', 10)) // Allow up to 10 images
+  @ApiOperation({ summary: 'Upload multiple images' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        images: {
+          type: 'array',
+          items: {
+            type: 'string',
+            format: 'binary',
+          },
+        },
+      },
+      required: ['images'],
+    },
+  })
+  @ApiOkResponse({
+    description: 'Successfully uploaded multiple images',
+    type: UploadImageResponseDto,
+    isArray: true, // Define response as an array of DTOs
+  })
+  uploadMultipleImages(@UploadedFiles() files: Express.Multer.File[]) {
+    return this.imageService.uploadMultipleFiles(files);
   }
 
   @Delete(':publicId')

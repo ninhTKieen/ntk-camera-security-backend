@@ -32,6 +32,46 @@ export class ImageService {
     });
   }
 
+  async getAllImages(folder?: string): Promise<any> {
+    return new Promise((resolve, reject) => {
+      cloudinary.api.resources(
+        {
+          type: 'upload',
+          prefix: folder || '',
+          max_results: 500,
+        },
+        (error, result) => {
+          if (error) {
+            reject(error);
+          }
+          resolve({
+            total: result.resources?.length,
+            images: result.resources?.map((image) => ({
+              imagePublicId: image.public_id,
+              imagePublicUrl: image.secure_url,
+              imageSecureUrl: image.secure_url,
+              width: image.width,
+              height: image.height,
+              format: image.format,
+            })),
+          });
+        },
+      );
+    });
+  }
+
+  async uploadMultipleFiles(
+    files: Express.Multer.File[],
+  ): Promise<UploadImageResponse[]> {
+    return Promise.all(
+      files.map((file) =>
+        this.uploadFile(file).then((result) => {
+          return result;
+        }),
+      ),
+    );
+  }
+
   async deleteFile(publicId: string): Promise<{ result: string }> {
     return new Promise((resolve, reject) => {
       cloudinary.uploader.destroy(publicId, (error, result) => {

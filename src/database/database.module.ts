@@ -9,6 +9,7 @@ import { EstateMember } from 'src/entities/estate-member.entity';
 import { Estate } from 'src/entities/estate.entity';
 import { FcmToken } from 'src/entities/fcm-token.entity';
 import { RecognizedFace } from 'src/entities/recognized-face.entity';
+import { Relay } from 'src/entities/relay.entity';
 import { User } from 'src/entities/user.entity';
 import { DataSource } from 'typeorm';
 
@@ -34,6 +35,7 @@ import { DataSource } from 'typeorm';
           Area,
           Device,
           RecognizedFace,
+          Relay,
         ],
       }),
       dataSourceFactory: async (options) => {

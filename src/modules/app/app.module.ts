@@ -16,6 +16,7 @@ import { DeviceGateway } from '../devices/device.gateway';
 import { EstateModule } from '../estates/estate.module';
 import { FirebaseModule } from '../firebase/firebase.module';
 import { ImageModule } from '../image/image.module';
+import { RelayGateway } from '../relays/relay.gateway';
 import { RelayModule } from '../relays/relay.module';
 import { UsersModule } from '../users/users.module';
 import { AppController } from './app.controller';
@@ -52,6 +53,7 @@ import { AppController } from './app.controller';
       useClass: ResponseInterceptor,
     },
     DeviceGateway,
+    RelayGateway,
   ],
 })
 export class AppModule {}

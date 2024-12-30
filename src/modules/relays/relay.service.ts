@@ -20,10 +20,9 @@ export class RelayService {
     private readonly estateService: EstateService,
   ) {}
 
-  async create(createRelayDto: CreateRelayDto, userId: number) {
-    const estate = await this.estateService.findById(
+  async create(createRelayDto: CreateRelayDto) {
+    const estate = await this.estateService.adminFindById(
       createRelayDto.estateId,
-      userId,
     );
 
     const relay = this.relayRepository.create({
@@ -130,8 +129,11 @@ export class RelayService {
     };
   }
 
-  async update(id: number, updateRelayDto: UpdateRelayDto, userId: number) {
-    const relay = await this.findOne(id, userId);
+  async adminFindOne(id: number) {
+    const relay = await this.relayRepository.findOne({
+      where: { id },
+      relations: ['estate'],
+    });
 
     if (!relay) {
       throw new HttpException(
@@ -143,8 +145,39 @@ export class RelayService {
       );
     }
 
+    return {
+      code: HttpStatus.OK,
+      message: 'Get relay successfully',
+      data: relay,
+    };
+  }
+
+  async adminUpdate(id: number, updateRelayDto: UpdateRelayDto) {
+    const relay = await this.adminFindOne(id);
+
+    if (!relay) {
+      throw new HttpException(
+        {
+          code: HttpStatus.NOT_FOUND,
+          message: 'Relay not found',
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    console.log('updateRelayDto', updateRelayDto);
+
+    const estate = await this.estateService.adminFindById(
+      updateRelayDto.estateId,
+    );
+
+    console.log('estate', estate);
+
+    delete updateRelayDto.estateId;
+
     await this.relayRepository.update(id, {
       ...updateRelayDto,
+      estate,
     });
 
     return {

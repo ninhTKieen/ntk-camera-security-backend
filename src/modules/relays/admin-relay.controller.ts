@@ -44,20 +44,16 @@ export class AdminRelaysController {
   @ApiOperation({ summary: 'Create relay' })
   @Post('/create')
   @ApiOkResponseCommon(Relay)
-  create(@Request() req: any, @Body() body: CreateRelayDto) {
-    return this.relayService.create(body, req.user.id);
+  create(@Body() body: CreateRelayDto) {
+    return this.relayService.create(body);
   }
 
   @UseGuards(AuthGuard, AdminGuard)
   @ApiOperation({ summary: 'Update relay' })
   @Patch(':id')
   @ApiOkResponseCommon(Relay)
-  update(
-    @Param('id', ParseIntPipe) id: number,
-    @Request() req: any,
-    @Body() body: UpdateRelayDto,
-  ) {
-    return this.relayService.update(id, body, req.user.id);
+  update(@Param('id', ParseIntPipe) id: number, @Body() body: UpdateRelayDto) {
+    return this.relayService.adminUpdate(id, body);
   }
 
   @UseGuards(AuthGuard, AdminGuard)

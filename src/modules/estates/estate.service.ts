@@ -170,6 +170,27 @@ export class EstateService {
     };
   }
 
+  async adminFindById(estateId: number) {
+    const estate = await this.estateRepository.findOne({
+      where: { id: estateId },
+      relations: ['members', 'areas'],
+    });
+
+    console.log('estate', estate);
+
+    if (!estate) {
+      throw new HttpException(
+        {
+          code: HttpStatus.NOT_FOUND,
+          message: 'Estate not found',
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    return estate;
+  }
+
   async update(
     estateId: number,
     updateEstateDto: UpdateEstateDto,

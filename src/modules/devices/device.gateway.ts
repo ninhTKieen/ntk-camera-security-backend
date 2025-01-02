@@ -99,7 +99,7 @@ export class DeviceGateway {
     return result;
   }
 
-  private async faceDetection(base64: string) {
+  private async faceDetection(base64: string, estateId: number) {
     const base64Data = base64.replace(/^data:image\/png;base64,/, '');
     const buffer = Buffer.from(base64Data, 'base64');
 
@@ -117,6 +117,23 @@ export class DeviceGateway {
           )
           .withFaceLandmarks()
           .withFaceDescriptors();
+
+        if (faces.length > 0) {
+          try {
+            const currentFolder = `${process.cwd()}/uploads/estates`;
+            const uploadsFolder = `${currentFolder}/${estateId}/faces`;
+
+            // Create the folder if it doesn't exist
+            if (!fs.existsSync(uploadsFolder)) {
+              fs.mkdirSync(uploadsFolder, { recursive: true });
+            }
+
+            // save base64 image to file
+            fs.writeFileSync(`${uploadsFolder}/${Date.now()}.png`, buffer);
+          } catch (error) {
+            console.error('Error saving image to file:', error);
+          }
+        }
 
         return faces;
       } else {
@@ -237,7 +254,7 @@ export class DeviceGateway {
       return;
     }
 
-    this.faceDetection(base64)
+    this.faceDetection(base64, estateId)
       .then((faces) => {
         // this.server.emit('device/receive-faces', faces);
         this.faceRecognition(faces, estateId)

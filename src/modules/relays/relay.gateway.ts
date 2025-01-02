@@ -9,6 +9,15 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
+type TPTZCommand =
+  | 'up'
+  | 'down'
+  | 'left'
+  | 'right'
+  | 'stop'
+  | 'zoomIn'
+  | 'zoomOut';
+
 @WebSocketGateway({
   cors: {
     origin: '*',
@@ -99,6 +108,32 @@ export class RelayGateway
         type: 'disconnect',
         clientId: client.id,
       });
+    });
+  }
+
+  @SubscribeMessage('ptzCommand')
+  async handlePtzCommand(
+    client: Socket,
+    ptzMessage: {
+      relayId: string;
+      command: TPTZCommand;
+      speed?: number;
+      rtsp: string;
+    },
+  ) {
+    const { relayId, command } = ptzMessage;
+
+    if (!this.relays.has(relayId)) {
+      client.emit('relayNotOnline');
+      return;
+    }
+
+    const relaySocketId = this.relays.get(relayId);
+
+    await this.server.to(relaySocketId).emit('ptzCommand', {
+      command,
+      speed: ptzMessage.speed || 1,
+      rtsp: ptzMessage.rtsp,
     });
   }
 }

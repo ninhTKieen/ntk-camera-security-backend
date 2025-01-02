@@ -8,8 +8,8 @@ import { EstateMember } from 'src/entities/estate-member.entity';
 import { Estate } from 'src/entities/estate.entity';
 import { RecognizedFace } from 'src/entities/recognized-face.entity';
 import { User } from 'src/entities/user.entity';
-import { CreateRecognizedFaceDto } from 'src/recognized-faces/dto/create-recognized-face.dto';
-import { UpdateRecognizedFaceDto } from 'src/recognized-faces/dto/update-recognized-face.dto';
+import { CreateRecognizedFaceDto } from 'src/modules/recognized-faces/dto/create-recognized-face.dto';
+import { UpdateRecognizedFaceDto } from 'src/modules/recognized-faces/dto/update-recognized-face.dto';
 import { Repository } from 'typeorm';
 
 import { ImageService } from '../image/image.service';

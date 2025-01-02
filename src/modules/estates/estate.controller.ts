@@ -26,9 +26,9 @@ import {
   ApiOkResponseCommon,
   ApiOkResponsePaginated,
 } from 'src/common/common-swagger-response.dto';
-import { CreateRecognizedFaceDto } from 'src/recognized-faces/dto/create-recognized-face.dto';
-import { GetRecognizedFaceDto } from 'src/recognized-faces/dto/get-recognized-faces.dto';
-import { UpdateRecognizedFaceDto } from 'src/recognized-faces/dto/update-recognized-face.dto';
+import { CreateRecognizedFaceDto } from 'src/modules/recognized-faces/dto/create-recognized-face.dto';
+import { GetRecognizedFaceDto } from 'src/modules/recognized-faces/dto/get-recognized-faces.dto';
+import { UpdateRecognizedFaceDto } from 'src/modules/recognized-faces/dto/update-recognized-face.dto';
 
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { AddMemberDto } from './dto/add-member.dto';

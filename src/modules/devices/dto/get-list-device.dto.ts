@@ -15,3 +15,17 @@ export class GetListDeviceDto extends GetPaginatedDto {
   @ApiProperty()
   estateId: number;
 }
+
+export class AdminGetListDeviceDto extends GetPaginatedDto {
+  @IsNumber()
+  @IsOptional()
+  @Type(() => Number)
+  @ApiProperty({ required: false })
+  areaId?: number;
+
+  @IsNumber()
+  @IsOptional()
+  @Type(() => Number)
+  @ApiProperty({ required: false })
+  estateId?: number;
+}

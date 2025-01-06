@@ -57,3 +57,10 @@ export class UpdateDeviceDto {
   @IsString()
   imageUrlId: string;
 }
+
+export class AdminUpdateDeviceDto extends UpdateDeviceDto {
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  estateId: string;
+}

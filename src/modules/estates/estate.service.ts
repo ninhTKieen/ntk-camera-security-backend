@@ -139,6 +139,8 @@ export class EstateService {
       ])
       .leftJoinAndSelect('estate.areas', 'area')
       .leftJoinAndSelect('estate.devices', 'device')
+      .leftJoinAndSelect('estate.recognizedFaces', 'recognizedFace')
+      .leftJoinAndSelect('estate.relays', 'relay')
       .where('estate.id = :estateId', { estateId })
       .getOne();
 
@@ -261,6 +263,46 @@ export class EstateService {
         {
           code: HttpStatus.BAD_REQUEST,
           message: 'Cannot delete estate with members',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (estate.devices.length > 0) {
+      throw new HttpException(
+        {
+          code: HttpStatus.BAD_REQUEST,
+          message: 'Cannot delete estate with devices',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (estate.areas.length > 0) {
+      throw new HttpException(
+        {
+          code: HttpStatus.BAD_REQUEST,
+          message: 'Cannot delete estate with areas',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (estate.recognizedFaces.length > 0) {
+      throw new HttpException(
+        {
+          code: HttpStatus.BAD_REQUEST,
+          message: 'Cannot delete estate with recognized faces',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (estate.relays.length > 0) {
+      throw new HttpException(
+        {
+          code: HttpStatus.BAD_REQUEST,
+          message: 'Cannot delete estate with relays',
         },
         HttpStatus.BAD_REQUEST,
       );

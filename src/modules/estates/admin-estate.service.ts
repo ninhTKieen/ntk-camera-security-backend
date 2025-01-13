@@ -3,13 +3,13 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as fs from 'fs';
 import { paginate } from 'nestjs-typeorm-paginate';
 import { EEstateMemberStatus, EEstateRole } from 'src/common/common.enum';
-import { Area } from 'src/entities/area.entity';
+import { Device } from 'src/entities/device.entity';
 import { EstateMember } from 'src/entities/estate-member.entity';
 import { Estate } from 'src/entities/estate.entity';
 import { RecognizedFace } from 'src/entities/recognized-face.entity';
+import { Relay } from 'src/entities/relay.entity';
 import { Repository } from 'typeorm';
 
-import { ImageService } from '../image/image.service';
 import { UsersService } from '../users/users.service';
 import { AdminAddMemberDto } from './dto/add-member.dto';
 import { AdminCreateEstateDto } from './dto/admin-create-estate.dto';
@@ -28,11 +28,13 @@ export class AdminEstateService {
     @InjectRepository(RecognizedFace)
     private readonly recognizedFaceRepository: Repository<RecognizedFace>,
 
-    @InjectRepository(Area)
-    private readonly areaRepository: Repository<Area>,
+    @InjectRepository(Device)
+    private readonly deviceRepository: Repository<Device>,
+
+    @InjectRepository(Relay)
+    private readonly relayRepository: Repository<Relay>,
 
     private readonly userService: UsersService,
-    private readonly imageService: ImageService,
   ) {}
 
   async getAll(userId: number, options: GetAllEstateParams) {
@@ -274,6 +276,7 @@ export class AdminEstateService {
   async delete(estateId: number) {
     const estate = await this.estateRepository.findOne({
       where: { id: estateId },
+      relations: ['members', 'recognizedFaces', 'devices', 'relays'],
     });
 
     if (!estate) {
@@ -284,6 +287,30 @@ export class AdminEstateService {
         },
         HttpStatus.NOT_FOUND,
       );
+    }
+
+    if (estate.members.length > 0) {
+      this.estateMemberRepository.delete({
+        estate: { id: estateId },
+      });
+    }
+
+    if (estate.recognizedFaces.length > 0) {
+      this.recognizedFaceRepository.delete({
+        estate: { id: estateId },
+      });
+    }
+
+    if (estate.devices.length > 0) {
+      this.deviceRepository.delete({
+        estate: { id: estateId },
+      });
+    }
+
+    if (estate.relays.length > 0) {
+      this.relayRepository.delete({
+        estate: { id: estateId },
+      });
     }
 
     await this.estateRepository.delete(estateId);

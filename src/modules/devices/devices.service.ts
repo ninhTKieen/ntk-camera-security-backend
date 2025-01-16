@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import * as fs from 'fs';
 import { paginate } from 'nestjs-typeorm-paginate';
 import { Device } from 'src/entities/device.entity';
 import { EstateService } from 'src/modules/estates/estate.service';
@@ -248,6 +249,41 @@ export class DevicesService {
     this.deviceRepository.update(id, updateDeviceDto);
 
     return true;
+  }
+
+  async getRecognizedFaces(deviceId: number, userId: number) {
+    const device = await this.findOne(deviceId, userId);
+
+    if (!device) {
+      throw new HttpException(
+        {
+          code: HttpStatus.NOT_FOUND,
+          message: 'Device not found',
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    const currentFolder = `${process.cwd()}/uploads/estates/${
+      device.estate.id
+    }/faces/${deviceId}`;
+
+    if (!fs.existsSync(currentFolder)) {
+      throw new HttpException(
+        {
+          code: HttpStatus.NOT_FOUND,
+          message: 'Faces folder not found',
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    const faces = fs.readdirSync(currentFolder);
+
+    return faces.map(
+      (face) =>
+        `/uploads/estates/${device.estate.id}/faces/${deviceId}/${face}`,
+    );
   }
 
   async adminUpdate(id: number, updateDeviceDto: UpdateDeviceDto) {

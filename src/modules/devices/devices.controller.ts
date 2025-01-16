@@ -73,4 +73,11 @@ export class DevicesController {
   remove(@Param('id', ParseIntPipe) id: number, @Request() req) {
     return this.devicesService.remove(id, req.user.id);
   }
+
+  @UseGuards(AuthGuard)
+  @ApiOperation({ summary: 'Get all recognized faces' })
+  @Get(':id/recognized-faces')
+  getRecognizedFaces(@Param('id', ParseIntPipe) id: number, @Request() req) {
+    return this.devicesService.getRecognizedFaces(id, req.user.id);
+  }
 }

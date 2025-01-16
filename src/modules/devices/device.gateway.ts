@@ -10,6 +10,7 @@ import * as fs from 'fs';
 import { Server, Socket } from 'socket.io';
 
 import { EstateService } from '../estates/estate.service';
+import { FirebaseService } from '../firebase/firebase.service';
 
 type TFace = faceApi.WithFaceDescriptor<
   faceApi.WithFaceLandmarks<
@@ -37,6 +38,9 @@ export class DeviceGateway {
   constructor(
     @Inject(forwardRef(() => EstateService))
     private readonly estateService: EstateService,
+
+    @Inject(forwardRef(() => FirebaseService))
+    private readonly firebaseService: FirebaseService,
   ) {
     this.loadModels();
   }
@@ -99,7 +103,11 @@ export class DeviceGateway {
     return result;
   }
 
-  private async faceDetection(base64: string, estateId: number) {
+  private async faceDetection(
+    base64: string,
+    estateId: number,
+    deviceId: number,
+  ) {
     const base64Data = base64.replace(/^data:image\/png;base64,/, '');
     const buffer = Buffer.from(base64Data, 'base64');
 
@@ -121,7 +129,7 @@ export class DeviceGateway {
         if (faces.length > 0) {
           try {
             const currentFolder = `${process.cwd()}/uploads/estates`;
-            const uploadsFolder = `${currentFolder}/${estateId}/faces`;
+            const uploadsFolder = `${currentFolder}/${estateId}/faces/${deviceId}`;
 
             // Create the folder if it doesn't exist
             if (!fs.existsSync(uploadsFolder)) {
@@ -254,7 +262,7 @@ export class DeviceGateway {
       return;
     }
 
-    this.faceDetection(base64, estateId)
+    this.faceDetection(base64, estateId, deviceId)
       .then((faces) => {
         // this.server.emit('device/receive-faces', faces);
         this.faceRecognition(faces, estateId)

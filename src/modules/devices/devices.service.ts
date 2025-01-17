@@ -280,10 +280,10 @@ export class DevicesService {
 
     const faces = fs.readdirSync(currentFolder);
 
-    return faces.map(
-      (face) =>
-        `/uploads/estates/${device.estate.id}/faces/${deviceId}/${face}`,
-    );
+    return faces.map((face) => ({
+      uri: `/uploads/estates/${device.estate.id}/faces/${deviceId}/${face}`,
+      time: face.split('.')[0],
+    }));
   }
 
   async adminUpdate(id: number, updateDeviceDto: UpdateDeviceDto) {

@@ -264,13 +264,12 @@ export class DeviceGateway {
 
     this.faceDetection(base64, estateId, deviceId)
       .then((faces) => {
-        // this.server.emit('device/receive-faces', faces);
         this.faceRecognition(faces, estateId)
-          .then((result) => {
-            const room = `estate-${estateId}-device-${deviceId}-${client.id}`;
-            this.server
-              .to(room)
-              .emit('device/receive-recognized-faces', result);
+          .then(() => {
+            // const room = `estate-${estateId}-device-${deviceId}-${client.id}`;
+            // this.server
+            //   .to(room)
+            //   .emit('device/receive-recognized-faces', result);
             // client.emit('device/receive-recognized-faces', result);
           })
           .catch((error) => {
